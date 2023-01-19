@@ -1,0 +1,77 @@
+<resources>
+  <string name="app_name">Scout Builder</string>
+  <string name="yes_no">YesNo</string>
+  <string name="counter">counter</string>
+  <string name="json_string">{"Cells":3,"cellContainers":[{"Cell_Number":0,"Cell_Type":"YesNo","param":{"Cell_Default":1,"Cell_Max":10,"Cell_Min":0,"Cell_Type":"YesNo"}},{"Cell_Number":1,"Cell_Type":"Counter","param":{"Cell_Default":1,"Cell_Max":10,"Cell_Min":0,"Cell_Type":"Counter"}},{"Cell_Number":2,"Cell_Type":"Segment","param":{"Cell_Segment_Labels":["1","2","3","4","5","6"],"Cell_Segments":6,"Cell_Type":"Segment"}},{"Cell_Number":3,"Cell_Type":"List","param":{"Cell_Entry_Labels":["Java","C++","Labview"],"Cell_Total_Entries":3,"Cell_Type":"List"}}],"Dark_Theme":false,"Page_Title":"Page Title","Version":0.1}</string>
+  <string name="decrement">decrement</string>
+  <string name="unrecognized_cell_type">Unknown Cell Type</string>
+
+  <string name="plus">+</string>
+  <string name="minus">-</string>
+  <string name="one">1</string>
+  <string name="two">2</string>
+  <string name="three">3</string>
+  <string name="four">4</string>
+  <string name="five">5</string>
+  <string name="six">6</string>
+  <string name="no">No</string>
+  <string name="yes">Yes</string>
+  <string name="menu_type">Type</string>
+  <string name="min_value">Min Value</string>
+  <string name="max_value">Max Value</string>
+  <string name="cell_title">title</string>
+  <string name="cell_max">max</string>
+  <string name="cell_min">min</string>
+  <string name="number_of_segments">Number of Segments</string>
+  <string name="import_menu">Import</string>
+  <string name="export_menu">Export</string>
+  <string name="save_menu">Save</string>
+  <string name="reset_menu">Reset</string>
+  <string name="dark_mode">Dark Mode</string>
+  <string name="default_value">Default Value</string>
+
+  <!--  #TODO  -->
+  <string name="credits">Cube and Cone images from Smashicons on flaticon.com</string>
+  <string name="YesNoType">YesNo</string>
+  <string name="CounterType">Counter</string>
+  <string name="SegmentType">Segment</string>
+  <string name="ListType">List</string>
+  <string name="TextType">Text</string>
+  <string name="CounterMinEquals">Max and min are equal</string>
+  <string name="CounterMinGreaterEqual">Max is lower to min</string>
+  <string name="CounterMaxEquals">Max and min are equal</string>
+  <string name="CounterMaxLessEqual">Max is lower to min</string>
+  <string name="CounterDefGreater">Default is lower than min</string>
+  <string name="CounterDefLess">Default is higher then max</string>
+  <string name="CounterMinLessEquals">Min is higher then max</string>
+  <string name="cancel">Cancel</string>
+  <string name="set">Set</string>
+  <string name="SegmentTextTitle">To set the text of the segments, please fill in the fields below</string>
+  <string name="SegmentWarning">Min 2, Max 6</string>
+  <string name="DialogAdd">Add Item</string>
+  <string name="CellBuilderDialogTitle">Choose a cell type</string>
+  <string name="ImportButtonTitle">Import Cells</string>
+  <string name="ImportTitle">Grab the following from the clipboard?</string>
+  <string name="ExportButtonTitle">Export Cells</string>
+  <string name="ExportTitle">Send the following to the clipboard</string>
+  <string name="AddAutoCell">Add Auto Cell</string>
+  <string name="AddTeleopCell">Add Teleop Cell</string>
+  <string name="PrefDebug_tile">Pref Debug Menu</string>
+  <string name="TableDefaultTitle">Unknown Side</string>
+  <string name="enter_text_for_button_1">Enter text for button 1</string>
+  <string name="enter_text_for_button_2">Enter text for button 2</string>
+  <string name="enter_text_for_button_3">Enter text for button 3</string>
+  <string name="enter_text_for_button_4">Enter text for button 4</string>
+  <string name="enter_text_for_button_5">Enter text for button 5</string>
+  <string name="enter_text_for_button_6">Enter text for button 6</string>
+  <string name="HintTextDefault">Hint Text</string>
+  <string name="DefaultTitle">Enter a Title</string>
+  <string name="example">Example</string>
+  <string name="HintTextTitle">Enter hint text\n(Optional)</string>
+  <string name="SegmentButtonText">Configure Button Text</string>
+  <string name="ListTitle">Add item to list</string>
+  <string name="preview">Preview</string>
+  <string name="ListAdd">Add Item</string>
+  <string name="ImagebuttonContentDesc">Cone/Cube/X Image button</string>
+
+</resources>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main_menu">
+
+    <item
+        android:id="@+id/action_add_top"
+        android:title="@string/AddAutoCell"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_add_bot"
+        android:title="@string/AddTeleopCell"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_import"
+        android:title="@string/import_menu"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_export"
+        android:title="@string/export_menu"
+        app:showAsAction="ifRoom" />
+
+    <item android:id="@+id/action_reorder"
+        android:title="Reordering off"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_columns"
+        android:title="2 Column mode on"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_dark_mode"
+        android:title="@string/dark_mode"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_color"
+        android:title="Change team color"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_launch"
+        android:title="Launch Test"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_hide_table"
+        android:title="Enable 2023 tables"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_debug"
+        android:title="@string/PrefDebug_tile"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_reset"
+        android:title="@string/reset_menu"
+        app:showAsAction="never" />
+</menu>
