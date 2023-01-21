@@ -32,6 +32,7 @@ dependencies {
 
     // Don't update to 1.6+ until dependency issues are resolved
     // Backwards support for modern Android features on older devices
+    //noinspection GradleDependency
     implementation 'androidx.appcompat:appcompat:1.5.1'
 
     // Material Design UI Components

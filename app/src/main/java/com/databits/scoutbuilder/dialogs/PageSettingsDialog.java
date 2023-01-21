@@ -50,49 +50,16 @@ public class PageSettingsDialog extends DialogFragment {
 
     bundle = getArguments();
     // Inflate and set the layout for the dialog
-    View v = inflater.inflate(R.layout.popup_yesno, null);
+    View v = inflater.inflate(R.layout.popup_page, null);
 
-    String title = getTitle(v);
-
-    TextView picker_title = v.findViewById(R.id.popup_title_text);
-    TextView exampleTitle = v.findViewById(R.id.popup_title_example);
-
-    // Set default title to both TextViews
-    picker_title.setText(title);
-    exampleTitle.setText(title);
-
-    // Automatically bring up the keyboard
-    picker_title.requestFocus();
-
-    // Set the title of the example to the title of the picker as it types
-    picker_title.addTextChangedListener(new TextWatcher() {
-      @Override
-      public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-      }
-
-      @Override
-      public void onTextChanged(CharSequence s, int start, int before, int count) {
-        if (s.length() > 0) {
-          exampleTitle.setText(s);
-        }
-      }
-
-      @Override
-      public void afterTextChanged(Editable s) {
-      }
-    });
 
     // Pass null as the parent view because its going in the dialog layout
     builder.setView(v)
         // Add action buttons
         .setPositiveButton(getString(R.string.DialogAdd), (dialog, id) -> {
-          // Create cell object to be returned to the activity
-          String cellType = "YesNo";
-          CellParam cellParam = new CellParam(cellType);
-          cellParam.setCellType(cellType);
-          Cell newCell = new Cell(bundle.getInt("id"),picker_title.getText().toString(), cellType, cellParam);
 
-          listener.onPageSettingsDialogPositiveClick(newCell, bundle.getBoolean("location"));
+
+          //listener.onPageSettingsDialogPositiveClick(newCell, bundle.getBoolean("location"));
         })
         .setNegativeButton(getString(R.string.cancel), (dialog, id) -> {
           if (PageSettingsDialog.this.getDialog() != null) {
@@ -102,9 +69,4 @@ public class PageSettingsDialog extends DialogFragment {
     return builder.create();
   }
 
-  public String getTitle(View v) {
-    TextView picker_title = v.findViewById(R.id.popup_title_text);
-    String savedTitle = bundle.getString("title");
-    return savedTitle;
-  }
 }

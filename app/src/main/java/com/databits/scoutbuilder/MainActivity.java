@@ -32,6 +32,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.databits.scoutbuilder.dialogs.CounterDialog;
 import com.databits.scoutbuilder.dialogs.ListDialog;
+import com.databits.scoutbuilder.dialogs.PageSettingsDialog;
 import com.databits.scoutbuilder.dialogs.SegmentDialog;
 import com.databits.scoutbuilder.dialogs.TextboxDialog;
 import com.databits.scoutbuilder.dialogs.YesNoDialog;
@@ -59,7 +60,8 @@ import permissions.dispatcher.RuntimePermissions;
 @RuntimePermissions
 public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNoDialogListener,
     CounterDialog.CounterDialogListener, SegmentDialog.SegmentDialogListener,
-    ListDialog.ListDialogListener, TextboxDialog.TextboxDialogListener {
+    ListDialog.ListDialogListener, TextboxDialog.TextboxDialogListener,
+    PageSettingsDialog.PageSettingsDialogListener {
 
     private static final String TAG = "MainActivity";
     private static final int NONE = 0;
@@ -647,7 +649,7 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
         }
 
         if (id == R.id.action_launch) {
-
+            showPageSettingsDialog("test");
         }
 
         if (id == R.id.action_export) {
@@ -759,6 +761,14 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
         return super.onOptionsItemSelected(item);
     }
 
+    private void showPageSettingsDialog(String title) {
+        DialogFragment dialog = new TextboxDialog();
+        Bundle args = new Bundle();
+        args.putString("title", title);
+        dialog.setArguments(args);
+        dialog.show(getSupportFragmentManager().beginTransaction(), "PageSettingsDialog");
+    }
+
     private void showTextboxDialog(String title, int viewId, boolean location) {
         DialogFragment dialog = new TextboxDialog();
         Bundle args = new Bundle();
@@ -839,5 +849,9 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
         RecyclerAdapter mAdapter = location ? mAdapterTop : mAdapterBot;
         RecyclerView mRecyclerView = location ? mRecyclerViewTop : mRecyclerViewBot;
         createItem(mAdapter, mRecyclerView, newCell);
+    }
+
+    @Override public void onPageSettingsDialogPositiveClick(Cell newCell, boolean location) {
+
     }
 }
