@@ -58,7 +58,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.7.0'
 
     // Cross application value storage
-    implementation 'com.github.deadman96385:PowerPreference:2.2.0'
+    implementation 'com.github.AliAsadi:PowerPreference:2.1.1'
 
     // Permissions handler
     implementation "com.github.permissions-dispatcher:permissionsdispatcher:4.9.2"
