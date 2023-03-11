@@ -34,6 +34,18 @@
             />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <ImageButton
+        android:id="@+id/help_button"
+        android:layout_width="17dp"
+        android:layout_height="17dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/help_icon"
+        app:layout_constraintBottom_toTopOf="@+id/number_counter_example"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.3"
+        app:layout_constraintStart_toEndOf="@+id/popup_title_example"
+        />
+
     <TextView
         android:id="@+id/help_text"
         android:layout_width="wrap_content"

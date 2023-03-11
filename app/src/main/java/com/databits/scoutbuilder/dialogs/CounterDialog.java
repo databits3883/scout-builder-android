@@ -7,15 +7,23 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 import com.databits.scoutbuilder.R;
 import com.databits.scoutbuilder.model.Cell;
 import com.databits.scoutbuilder.model.CellParam;
+import com.databits.scoutbuilder.Utils;
 import com.preference.PowerPreference;
 import com.preference.Preference;
+import com.skydoves.balloon.ArrowOrientation;
+import com.skydoves.balloon.ArrowPositionRules;
+import com.skydoves.balloon.Balloon;
+import com.skydoves.balloon.BalloonAnimation;
+import com.skydoves.balloon.BalloonSizeSpec;
 import com.travijuu.numberpicker.library.NumberPicker;
 
 public class CounterDialog extends DialogFragment {
@@ -32,6 +40,8 @@ public class CounterDialog extends DialogFragment {
   }
 
   CounterDialogListener listener;
+
+  Utils utils;
 
   // Override the Fragment.onAttach() method to instantiate the NoticeDialogListener
   @Override
@@ -58,8 +68,13 @@ public class CounterDialog extends DialogFragment {
     // Inflate and set the layout for the dialog
     View v = inflater.inflate(R.layout.popup_counter, null);
 
-    String title = getTitle(location, realId);
-    String help = getHelp(location, realId);
+    utils = new Utils(requireContext());
+
+    String title = utils.getTitle(location, realId, bundle);
+    String help = utils.getHelp(location, realId, bundle);
+
+    Balloon.Builder helpBuilder = utils.helpBuilder();
+    helpBuilder.setText(help);
 
     TextView picker_title = v.findViewById(R.id.popup_title_text);
     TextView exampleTitle = v.findViewById(R.id.popup_title_example);
@@ -69,6 +84,7 @@ public class CounterDialog extends DialogFragment {
     NumberPicker picker_example = v.findViewById(R.id.number_counter_example);
     TextView picker_help = v.findViewById(R.id.popup_help_text);
     TextView popup_warning = v.findViewById(R.id.popupWarning);
+    ImageButton helpIcon = v.findViewById(R.id.help_button);
 
     viewId = bundle.getInt("id");
     realId = bundle.getInt("real_id");
@@ -158,6 +174,10 @@ public class CounterDialog extends DialogFragment {
     // Automatically bring up the keyboard
     picker_title.requestFocus();
 
+    helpIcon.setOnClickListener(v1 -> {
+      helpBuilder.build().showAlignBottom(helpIcon);
+    });
+
     // Set the title of the example to the title of the picker as it types
     picker_title.addTextChangedListener(new TextWatcher() {
       @Override
@@ -176,10 +196,27 @@ public class CounterDialog extends DialogFragment {
       }
     });
 
+    picker_help.addTextChangedListener(new TextWatcher() {
+      @Override
+      public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+      }
+
+      @Override
+      public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+      }
+
+      @Override
+      public void afterTextChanged(Editable s) {
+        if (s.length() > 0) {
+          helpBuilder.setText(s.toString());
+        }
+      }
+    });
     // Pass null as the parent view because its going in the dialog layout
     builder.setView(v)
         // Add action buttons
-        .setPositiveButton(textSelector(), (dialog, id) -> {
+        .setPositiveButton(utils.textSelector(), (dialog, id) -> {
           // Create cell object to be returned to the activity
           String cellType = getString(R.string.CounterType);
           CellParam cellParam = new CellParam(cellType);
@@ -225,33 +262,5 @@ public class CounterDialog extends DialogFragment {
           }
         });
     return builder.create();
-  }
-
-  public String textSelector() {
-    return preference.getBoolean("edit_mode") ? getString(R.string.DialogEdit) : getString(R.string.DialogAdd);
-  }
-
-  public String getTitle(boolean location, int viewId) {
-    if (!preference.getBoolean("edit_mode")) {
-      return bundle.getString("title");
-    } else {
-      if (location) {
-        return preference.getString("top_" + viewId + "_title_value");
-      } else {
-        return preference.getString("bot_" + viewId + "_title_value");
-      }
-    }
-  }
-
-  public String getHelp(boolean location, int viewId) {
-    if (!preference.getBoolean("edit_mode")) {
-      return bundle.getString("help");
-    } else {
-      if (location) {
-        return preference.getString("top_" + viewId + "_help_value");
-      } else {
-        return preference.getString("bot_" + viewId + "_help_value");
-      }
-    }
   }
 }

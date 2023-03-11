@@ -15,6 +15,7 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 import com.databits.scoutbuilder.R;
+import com.databits.scoutbuilder.Utils;
 import com.databits.scoutbuilder.model.Cell;
 import com.databits.scoutbuilder.model.CellParam;
 import com.preference.PowerPreference;
@@ -39,6 +40,8 @@ public class YesNoDialog extends DialogFragment {
 
   YesNoDialogListener listener;
 
+  Utils utils;
+
   // Override the Fragment.onAttach() method to instantiate the NoticeDialogListener
   @Override
   public void onAttach(@NonNull Context context) {
@@ -60,19 +63,7 @@ public class YesNoDialog extends DialogFragment {
     // Get the layout inflater
     LayoutInflater inflater = requireActivity().getLayoutInflater();
 
-    Balloon.Builder helpBuilder = new Balloon.Builder(requireContext())
-        .setArrowSize(10)
-        .setArrowOrientation(ArrowOrientation.TOP)
-        .setArrowPositionRules(ArrowPositionRules.ALIGN_BALLOON)
-        .setArrowPosition(0.5f)
-        .setWidth(BalloonSizeSpec.WRAP)
-        .setHeight(BalloonSizeSpec.WRAP)
-        .setPadding(6)
-        .setTextSize(20f)
-        .setCornerRadius(4f)
-        .setAlpha(0.8f)
-        .setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-        .setBalloonAnimation(BalloonAnimation.FADE);
+    utils = new Utils(requireContext());
 
     bundle = getArguments();
     // Inflate and set the layout for the dialog
@@ -81,9 +72,10 @@ public class YesNoDialog extends DialogFragment {
     realId = bundle.getInt("real_id");
     location = bundle.getBoolean("location");
 
-    String title = getTitle(location, realId);
-    String help = getHelp(location, realId);
+    String title = utils.getTitle(location, realId, bundle);
+    String help = utils.getHelp(location, realId, bundle);
 
+    Balloon.Builder helpBuilder = utils.helpBuilder();
     helpBuilder.setText(help);
 
     TextView picker_title = v.findViewById(R.id.popup_title_text);
@@ -152,7 +144,7 @@ public class YesNoDialog extends DialogFragment {
     // Pass null as the parent view because its going in the dialog layout
     builder.setView(v)
         // Add action buttons
-        .setPositiveButton(textSelector(), (dialog, id) -> {
+        .setPositiveButton(utils.textSelector(), (dialog, id) -> {
           // Create cell object to be returned to the activity
           String cellType = getString(R.string.YesNoType);
           String newTitle = picker_title.getText().toString();
@@ -160,7 +152,7 @@ public class YesNoDialog extends DialogFragment {
           CellParam cellParam = new CellParam(cellType);
           cellParam.setType(cellType);
           cellParam.setHelpText(newHelp);
-          Cell newCell = new Cell(bundle.getInt("id"),newTitle, cellType, cellParam);
+          Cell newCell = new Cell(bundle.getInt("id"), newTitle, cellType, cellParam);
 
           if (location) {
             preference.putString("top_" + viewId + "_title_value", newTitle);
@@ -180,31 +172,5 @@ public class YesNoDialog extends DialogFragment {
     return builder.create();
   }
 
-  public String textSelector() {
-    return preference.getBoolean("edit_mode") ? getString(R.string.DialogEdit) : getString(R.string.DialogAdd);
-  }
 
-  public String getTitle(boolean location, int viewId) {
-    if (!preference.getBoolean("edit_mode")) {
-      return bundle.getString("title");
-    } else {
-      if (location) {
-        return preference.getString("top_" + viewId + "_title_value");
-      } else {
-        return preference.getString("bot_" + viewId + "_title_value");
-      }
-    }
-  }
-
-  public String getHelp(boolean location, int viewId) {
-    if (!preference.getBoolean("edit_mode")) {
-      return bundle.getString("help");
-    } else {
-      if (location) {
-        return preference.getString("top_" + viewId + "_help_value");
-      } else {
-        return preference.getString("bot_" + viewId + "_help_value");
-      }
-    }
-  }
 }
