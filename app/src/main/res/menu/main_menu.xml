@@ -14,42 +14,28 @@
         app:showAsAction="always" />
 
     <item
+        android:id="@+id/action_page_settings"
+        android:title="@string/page_settings"
+        app:showAsAction="ifRoom" />
+
+    <item
         android:id="@+id/action_import"
         android:title="@string/import_menu"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/action_export"
         android:title="@string/export_menu"
-        app:showAsAction="ifRoom" />
-
-    <item android:id="@+id/action_reorder"
-        android:title="Reordering off"
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/action_columns"
-        android:title="2 Column mode on"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_dark_mode"
-        android:title="@string/dark_mode"
+        android:id="@+id/edit_mode"
+        android:title="@string/edit_mode"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/action_color"
-        android:title="Change team color"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_launch"
-        android:title="Launch Test"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_hide_table"
-        android:title="Enable 2023 tables"
+        android:title="@string/change_team_color"
         app:showAsAction="never" />
 
     <item

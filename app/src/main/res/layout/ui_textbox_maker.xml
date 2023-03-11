@@ -22,7 +22,7 @@
 
         <!--This is the actual edit text which takes the input-->
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/edit_text_demo"
+            android:id="@+id/enteredText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textCursorDrawable="@null"

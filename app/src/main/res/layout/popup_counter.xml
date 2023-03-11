@@ -5,27 +5,61 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/popup_help_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/guideline_v_50_percent"
+        app:layout_constraintTop_toBottomOf="@+id/help_text"
+        app:boxStrokeColor="@color/accent_color"
+        app:counterTextColor="@color/accent_color"
+        app:hintTextColor="@color/accent_color"
+        >
+
+        <!--This is the actual edit text which takes the input-->
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/popup_help_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:imeOptions="actionDone"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:textCursorDrawable="@null"
+            android:textSize="34sp"
+            app:layout_constraintBottom_toTopOf="@+id/yes_no_example"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/filledTextField"
+            />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <TextView
+        android:id="@+id/help_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/enter_the_help_text"
+        android:textAlignment="center"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/guideline_v_50_percent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
     <TextView
         android:id="@+id/popup_title_example"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
+        android:layout_marginTop="24dp"
         android:text="@string/example"
         android:textSize="20sp"
         app:layout_constraintBottom_toTopOf="@+id/number_counter_example"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-        android:id="@+id/popup_set_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="@string/set"
-        android:backgroundTint="@color/accent_color"
-        app:layout_constraintEnd_toStartOf="@+id/guideline_v_50_percent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/popup_edittext_layout" />
+        app:layout_constraintTop_toBottomOf="@+id/number_counter_default"
+        />
 
     <TextView
         android:id="@+id/title"
@@ -76,27 +110,28 @@
         android:id="@+id/max_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:text="@string/max_value"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/guideline_v_50_percent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toStartOf="@+id/guideline_v_50_percent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/popup_edittext_layout"
+        />
 
     <com.travijuu.numberpicker.library.NumberPicker
         android:id="@+id/number_counter_max"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/guideline_v_50_percent"
+        app:layout_constraintEnd_toStartOf="@+id/guideline_v_50_percent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/max_title"
         numberpicker:custom_layout="@layout/ui_number_picker"
         numberpicker:focusable="false"
         numberpicker:max="99"
         numberpicker:min="0"
         numberpicker:unit="1"
-        numberpicker:value="0" />
+        numberpicker:value="0"
+        />
 
     <TextView
         android:id="@+id/default_title"
@@ -105,8 +140,9 @@
         android:layout_marginTop="8dp"
         android:text="@string/default_value"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/guideline_v_50_percent"
-        app:layout_constraintTop_toBottomOf="@+id/number_counter_min" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/number_counter_min"
+        />
 
     <com.travijuu.numberpicker.library.NumberPicker
         android:id="@+id/number_counter_default"
@@ -114,14 +150,15 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/guideline_v_50_percent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/default_title"
         numberpicker:custom_layout="@layout/ui_number_picker"
         numberpicker:focusable="false"
         numberpicker:max="99"
         numberpicker:min="0"
         numberpicker:unit="1"
-        numberpicker:value="0" />
+        numberpicker:value="0"
+        />
 
     <com.travijuu.numberpicker.library.NumberPicker
         android:id="@+id/number_counter_example"
@@ -136,7 +173,8 @@
         numberpicker:max="99"
         numberpicker:min="0"
         numberpicker:unit="1"
-        numberpicker:value="0" />
+        numberpicker:value="0"
+        />
 
     <com.travijuu.numberpicker.library.NumberPicker
         android:id="@+id/number_counter_min"
@@ -159,23 +197,23 @@
         android:id="@+id/min_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="16dp"
         android:text="@string/min_value"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/guideline_v_50_percent"
-        app:layout_constraintTop_toBottomOf="@+id/number_counter_max" />
+        app:layout_constraintTop_toBottomOf="@+id/popup_help_layout"
+        />
 
     <TextView
         android:id="@+id/popupWarning"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="47dp"
         android:textAlignment="center"
         android:textSize="24sp"
         app:layout_constraintBottom_toTopOf="@+id/popup_title_example"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/popup_set_button" />
+        />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_h_25_percent"
@@ -196,7 +234,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent=".25" />
+        app:layout_constraintGuide_percent="0.25"
+        />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_v_75_percent"

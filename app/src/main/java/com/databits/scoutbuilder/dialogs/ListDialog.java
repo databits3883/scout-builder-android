@@ -31,7 +31,7 @@ public class ListDialog extends DialogFragment {
 
 
   public interface ListDialogListener {
-    void onListDialogPositiveClick(Cell newCell, boolean location);
+    void onListDialogPositiveClick(Cell newCell, boolean location, int id);
   }
 
   ListDialogListener listener;
@@ -128,11 +128,11 @@ public class ListDialog extends DialogFragment {
     // Pass null as the parent view because its going in the dialog layout
     builder.setView(v)
         // Add action buttons
-        .setPositiveButton(R.string.DialogAdd, (dialog, id) -> {
+        .setPositiveButton(textSelector(), (dialog, id) -> {
           // Create cell object to be returned to the activity
           String cellType = getString(R.string.ListType);
           CellParam cellParam = new CellParam(cellType);
-          cellParam.setCellType(cellType);
+          cellParam.setType(cellType);
           String cellTitle = picker_title.getText().toString();
 
           for (int p = 0; p < entries.size(); p++) {
@@ -150,13 +150,13 @@ public class ListDialog extends DialogFragment {
             }
           }
 
-          cellParam.setCellTotalEntries(entries.size());
-          cellParam.setCellEntryLabels(entries);
+          cellParam.setTotalEntries(entries.size());
+          cellParam.setEntryLabels(entries);
 
           preference.setString(1 + "_title_value", cellTitle);
           Cell newCell = new Cell(viewId,picker_title.getText().toString(), cellType, cellParam);
 
-          listener.onListDialogPositiveClick(newCell, bundle.getBoolean("location"));
+          listener.onListDialogPositiveClick(newCell, bundle.getBoolean("location"), viewId);
         })
         .setNegativeButton(R.string.cancel, (dialog, id) -> {
           if (ListDialog.this.getDialog() != null) {
@@ -164,6 +164,10 @@ public class ListDialog extends DialogFragment {
           }
         });
     return builder.create();
+  }
+
+  public String textSelector() {
+    return preference.getBoolean("edit_mode") ? getString(R.string.DialogEdit) : getString(R.string.DialogAdd);
   }
 
   public String getTitle(View v) {

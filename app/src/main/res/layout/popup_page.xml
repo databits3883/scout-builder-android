@@ -1,49 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     >
 
-  <com.google.android.material.chip.ChipGroup
-      android:id="@+id/chip_group"
+  <TextView
+      android:id="@+id/textView"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
+      android:text="Exported Page Settings"
+      android:textColor="@color/black"
+      android:textSize="24sp"
+      app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toTopOf="parent"
-      app:chipSpacing="8dp"
-      app:chipSpacingHorizontal="16dp"
-      app:chipSpacingVertical="8dp"
-      app:selectionRequired="false"
-      app:singleSelection="false"
-      >
+      />
 
-    <com.google.android.material.chip.Chip
-        android:id="@+id/chip1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Chip 1"
-        app:checkedIcon="@android:drawable/checkbox_on_background"
-        app:chipBackgroundColor="@color/colorPrimary"
-        app:chipStrokeColor="@color/accent_color"
-        app:chipStrokeWidth="2dp"
-        app:icon="@android:drawable/checkbox_off_background"
-        app:iconTint="@color/accent_color"
-        />
+  <androidx.appcompat.widget.SwitchCompat
+      android:id="@+id/column_switch"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:checked="true"
+      android:text="2 Column mode"
+      android:textSize="20sp"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/textView"
+      />
 
-    <com.google.android.material.chip.Chip
-        android:id="@+id/chip2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Chip 2"
-        app:checkedIcon="@android:drawable/checkbox_on_background"
-        app:chipBackgroundColor="@color/colorPrimary"
-        app:chipStrokeColor="@color/accent_color"
-        app:chipStrokeWidth="2dp"
-        app:icon="@android:drawable/checkbox_off_background"
-        app:iconTint="@color/accent_color"
-        />
+  <androidx.appcompat.widget.SwitchCompat
+      android:id="@+id/tables_switch"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:checked="true"
+      android:text="Enable 2023 tables"
+      android:textSize="20sp"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/role_switch"
+      />
 
-  </com.google.android.material.chip.ChipGroup>
+  <androidx.appcompat.widget.SwitchCompat
+      android:id="@+id/role_switch"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:checked="true"
+      android:text="Pit or Crowd"
+      android:textSize="20sp"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/column_switch"
+      />
+
+  <androidx.appcompat.widget.SwitchCompat
+      android:id="@+id/auto_button"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="32dp"
+      android:text="Auto"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/tables_switch"
+      />
+
+  <androidx.appcompat.widget.SwitchCompat
+      android:id="@+id/teleop_button"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginEnd="32dp"
+      android:text="Teleop"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/tables_switch"
+      />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

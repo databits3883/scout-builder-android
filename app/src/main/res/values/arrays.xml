@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string-array name="team_list">
+  <item>167</item>
+  <item>525</item>
+  <item>1675</item>
+  <item>1792</item>
+  <item>2052</item>
+  <item>2129</item>
+  <item>2472</item>
+  <item>2491</item>
+  <item>2501</item>
+  <item>2502</item>
+  <item>2512</item>
+  <item>2667</item>
+  <item>2826</item>
+  <item>2987</item>
+  <item>3023</item>
+  <item>3100</item>
+  <item>3212</item>
+  <item>3298</item>
+  <item>3381</item>
+  <item>3418</item>
+  <item>3755</item>
+  <item>3883</item>
+  <item>3926</item>
+  <item>3928</item>
+  <item>4166</item>
+  <item>4181</item>
+  <item>4182</item>
+  <item>4226</item>
+  <item>4230</item>
+  <item>4239</item>
+  <item>4531</item>
+  <item>4623</item>
+  <item>4624</item>
+  <item>4703</item>
+  <item>4778</item>
+  <item>4786</item>
+  <item>5232</item>
+  <item>5271</item>
+  <item>5339</item>
+  <item>5541</item>
+  <item>5576</item>
+  <item>5586</item>
+  <item>5720</item>
+  <item>5913</item>
+  <item>6044</item>
+  <item>6132</item>
+  <item>6147</item>
+  <item>6421</item>
+  <item>6574</item>
+  <item>6758</item>
+  <item>7021</item>
+  <item>7273</item>
+  <item>7311</item>
+  <item>7530</item>
+  <item>7578</item>
+  <item>7677</item>
+  <item>7864</item>
+  <item>8700</item>
+  <item>8803</item>
+  <item>9257</item>
+</string-array>
+</resources>

@@ -54,10 +54,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import permissions.dispatcher.NeedsPermission;
-import permissions.dispatcher.RuntimePermissions;
-
-@RuntimePermissions
 public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNoDialogListener,
     CounterDialog.CounterDialogListener, SegmentDialog.SegmentDialogListener,
     ListDialog.ListDialogListener, TextboxDialog.TextboxDialogListener,
@@ -76,9 +72,8 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
     ItemTouchHelper.Callback callbackBot;
     ItemTouchHelper mItemTouchHelperBot;
     TableLayout[] tables;
-    String[] cellTypes = {"YesNo", "Counter", "Segment", "List", "Text", /*"Table"*/};
-    String[] cellTitles = {"YesNo_title", "Counter_Title", "Segment_Title", "List_Title", "Textbox_title"};
-    String[] curTables = {"Auto", "Teleop"};
+    String[] cellTypes = {"YesNo", "Counter", "Segment", "List", "Text", "TeamSelect", "TeamMatch"};
+    String[] cellTitles = {"YesNo_title", "Counter_Title", "Segment_Title", "List_Title", "Textbox_title", "TeamSelect_Title", "TeamMatch_Title"};
     private RecyclerAdapter mAdapterTop;
     private RecyclerAdapter mAdapterBot;
     private RecyclerView mRecyclerViewTop;
@@ -395,6 +390,14 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
                     cellParam.setTextHidden(false);
                     cellParam.setTextHint("Enter life here");
                     cellParam.setHelpText("This is a Text text");
+                    break;
+                case "TeamSelect":
+                    cellParam.setType(getString(R.string.TeamSelectType));
+                    cellParam.setHelpText("This is a TeamSelect text");
+                    break;
+                case "TeamMatch":
+                    cellParam.setType(getString(R.string.TeamMatchType));
+                    cellParam.setHelpText("This is a TeamMatch text");
                     break;
             }
             Cell cell = new Cell(i, cellTitles[i], cellType, cellParam);
@@ -824,7 +827,31 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
         dialog.show(getSupportFragmentManager().beginTransaction(), "PageSettingsDialog");
     }
 
-    private void showTextboxDialog(String title, int viewId, boolean location) {
+    private void showTeamSelectDialog(String title, String help, int viewId, int realViewId, boolean location) {
+        DialogFragment dialog = new TeamSelectDialog();
+        Bundle args = new Bundle();
+        args.putString("title", title);
+        args.putInt("id", viewId);
+        args.putBoolean("location", location);
+        args.putInt("real_id", realViewId);
+        args.putString("help", help);
+        dialog.setArguments(args);
+        dialog.show(getSupportFragmentManager().beginTransaction(), "TeamSelectDialog");
+    }
+
+    private void showTeamMatchDialog(String title, String help, int viewId, int realViewId, boolean location) {
+        DialogFragment dialog = new TeamMatchDialog();
+        Bundle args = new Bundle();
+        args.putString("title", title);
+        args.putInt("id", viewId);
+        args.putBoolean("location", location);
+        args.putInt("real_id", realViewId);
+        args.putString("help", help);
+        dialog.setArguments(args);
+        dialog.show(getSupportFragmentManager().beginTransaction(), "TitleDialog");
+    }
+
+    private void showTextboxDialog(String title, String help, int viewId, int realViewId, boolean location) {
         DialogFragment dialog = new TextboxDialog();
         Bundle args = new Bundle();
         args.putString("title", title);
@@ -1005,7 +1032,63 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
         }
     }
 
-    @Override public void onPageSettingsDialogPositiveClick(Cell newCell, boolean location) {
+    @Override public void onTeamSelectDialogPositiveClick(Cell newCell, boolean location, int position,
+        int realId) {
+        RecyclerAdapter mAdapter = location ? mAdapterTop : mAdapterBot;
+        RecyclerView mRecyclerView = location ? mRecyclerViewTop : mRecyclerViewBot;
+        if (!preference.getBoolean("edit_mode", false)) {
+            createItem(mAdapter, mRecyclerView, newCell);
+        } else {
+            // Cell is null if we want to delete the cell
+            if (newCell != null) {
+                Cell curCell = mAdapter.mCell.get(position);
+                curCell.setTitle(newCell.getTitle());
+                curCell.setParam(newCell.getParam());
+                mAdapter.notifyItemChanged(position);
+            } else {
+                preference.remove(position + "_help_value");
+                preference.remove(position + "_title_value");
+                mAdapter.mCell.remove(position);
+                mAdapter.notifyItemRemoved(position);
+            }
+        }
+    }
 
+    @Override public void onTeamMatchDialogPositiveClick(Cell newCell, boolean location, int position,
+        int realId) {
+        RecyclerAdapter mAdapter = location ? mAdapterTop : mAdapterBot;
+        RecyclerView mRecyclerView = location ? mRecyclerViewTop : mRecyclerViewBot;
+        if (!preference.getBoolean("edit_mode", false)) {
+            createItem(mAdapter, mRecyclerView, newCell);
+        } else {
+            // Cell is null if we want to delete the cell
+            if (newCell != null) {
+                Cell curCell = mAdapter.mCell.get(position);
+                curCell.setTitle(newCell.getTitle());
+                curCell.setParam(newCell.getParam());
+                mAdapter.notifyItemChanged(position);
+            } else {
+                preference.remove(position + "_help_value");
+                preference.remove(position + "_title_value");
+                mAdapter.mCell.remove(position);
+                mAdapter.notifyItemRemoved(position);
+            }
+        }
+    }
+
+    @Override public void onPageSettingsDialogPositiveClick(int table_status, boolean grid) {
+        tableSorter(table_status);
+
+        // Toggle and update the text
+        if (grid) {
+            mRecyclerViewTop.setLayoutManager(new GridLayoutManager(this, 2));
+            mRecyclerViewBot.setLayoutManager(new GridLayoutManager(this, 2));
+            preference.setBoolean("grid", true);
+
+        } else {
+            mRecyclerViewTop.setLayoutManager(new LinearLayoutManager(this));
+            mRecyclerViewBot.setLayoutManager(new LinearLayoutManager(this));
+            preference.setBoolean("grid", false);
+        }
     }
 }

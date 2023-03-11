@@ -23,9 +23,12 @@ public class CounterDialog extends DialogFragment {
 
   Preference preference = PowerPreference.getDefaultFile();
 
+  int viewId;
+  int realId;
+  boolean location;
 
   public interface CounterDialogListener {
-    void onCounterDialogPositiveClick(Cell newCell, boolean location);
+    void onCounterDialogPositiveClick(Cell newCell, boolean location, int position, int realId);
   }
 
   CounterDialogListener listener;
@@ -55,7 +58,8 @@ public class CounterDialog extends DialogFragment {
     // Inflate and set the layout for the dialog
     View v = inflater.inflate(R.layout.popup_counter, null);
 
-    String title = getTitle(v);
+    String title = getTitle(location, realId);
+    String help = getHelp(location, realId);
 
     TextView picker_title = v.findViewById(R.id.popup_title_text);
     TextView exampleTitle = v.findViewById(R.id.popup_title_example);
@@ -63,9 +67,12 @@ public class CounterDialog extends DialogFragment {
     NumberPicker picker_max = v.findViewById(R.id.number_counter_max);
     NumberPicker picker_default = v.findViewById(R.id.number_counter_default);
     NumberPicker picker_example = v.findViewById(R.id.number_counter_example);
+    TextView picker_help = v.findViewById(R.id.popup_help_text);
     TextView popup_warning = v.findViewById(R.id.popupWarning);
 
-    int viewId = bundle.getInt("id");
+    viewId = bundle.getInt("id");
+    realId = bundle.getInt("real_id");
+    location = bundle.getBoolean("location");
 
     int max = preference.getInt(viewId + "_max_picker_value", 0);
     int min = preference.getInt(viewId + "_min_picker_value", 0);
@@ -172,29 +179,45 @@ public class CounterDialog extends DialogFragment {
     // Pass null as the parent view because its going in the dialog layout
     builder.setView(v)
         // Add action buttons
-        .setPositiveButton(R.string.DialogAdd, (dialog, id) -> {
+        .setPositiveButton(textSelector(), (dialog, id) -> {
           // Create cell object to be returned to the activity
-          String cellType = getString(R.string.counter);
+          String cellType = getString(R.string.CounterType);
           CellParam cellParam = new CellParam(cellType);
-          cellParam.setCellType(cellType);
+          cellParam.setType(cellType);
           String cellTitle = picker_title.getText().toString();
           int new_max = picker_max.getValue();
           int new_min = picker_min.getValue();
           int default_value = picker_default.getValue();
           int unit_value = 1;
+          String newHelp = picker_help.getText().toString();
 
-          cellParam.setCellDefault(default_value);
-          cellParam.setCellMax(new_max);
-          cellParam.setCellMin(new_min);
-          cellParam.setCellUnit(unit_value);
-          preference.setInt(viewId + "_max_picker_value", new_max);
-          preference.setInt(viewId + "_min_picker_value", new_min);
-          preference.setInt(viewId + "_default_picker_value", default_value);
-          preference.setInt(viewId + "_unit_picker_value", unit_value);
-          preference.setString(1 + "_title_value", cellTitle);
+          cellParam.setDefault(default_value);
+          cellParam.setMax(new_max);
+          cellParam.setMin(new_min);
+          cellParam.setUnit(unit_value);
+          cellParam.setHelpText(newHelp);
+
           Cell newCell = new Cell(viewId,picker_title.getText().toString(), cellType, cellParam);
 
-          listener.onCounterDialogPositiveClick(newCell, bundle.getBoolean("location"));
+          if (location) {
+            preference.setInt("top_" + viewId + "_max_picker_value", new_max);
+            preference.setInt("top_" + viewId + "_min_picker_value", new_min);
+            preference.setInt("top_" + viewId + "_default_picker_value", default_value);
+            preference.setInt("top_" + viewId + "_unit_picker_value", unit_value);
+            preference.setInt("top_" + viewId + "_unit_picker_value", unit_value);
+            preference.setString("top_" + viewId + "_title_value", cellTitle);
+            preference.putString("top_" + viewId + "_help_value", newHelp);
+          } else {
+            preference.setInt("bot_" + viewId + "_max_picker_value", new_max);
+            preference.setInt("bot_" + viewId + "_min_picker_value", new_min);
+            preference.setInt("bot_" + viewId + "_default_picker_value", default_value);
+            preference.setInt("bot_" + viewId + "_unit_picker_value", unit_value);
+            preference.setInt("bot_" + viewId + "_unit_picker_value", unit_value);
+            preference.setString("bot_" + viewId + "_title_value", cellTitle);
+            preference.putString("bot_" + viewId + "_help_value", newHelp);
+          }
+
+          listener.onCounterDialogPositiveClick(newCell, location, viewId, realId);
         })
         .setNegativeButton(getString(R.string.cancel), (dialog, id) -> {
           if (CounterDialog.this.getDialog() != null) {
@@ -204,9 +227,31 @@ public class CounterDialog extends DialogFragment {
     return builder.create();
   }
 
-  public String getTitle(View v) {
-    TextView picker_title = v.findViewById(R.id.popup_title_text);
-    String savedTitle = bundle.getString("title");
-    return savedTitle;
+  public String textSelector() {
+    return preference.getBoolean("edit_mode") ? getString(R.string.DialogEdit) : getString(R.string.DialogAdd);
+  }
+
+  public String getTitle(boolean location, int viewId) {
+    if (!preference.getBoolean("edit_mode")) {
+      return bundle.getString("title");
+    } else {
+      if (location) {
+        return preference.getString("top_" + viewId + "_title_value");
+      } else {
+        return preference.getString("bot_" + viewId + "_title_value");
+      }
+    }
+  }
+
+  public String getHelp(boolean location, int viewId) {
+    if (!preference.getBoolean("edit_mode")) {
+      return bundle.getString("help");
+    } else {
+      if (location) {
+        return preference.getString("top_" + viewId + "_help_value");
+      } else {
+        return preference.getString("bot_" + viewId + "_help_value");
+      }
+    }
   }
 }

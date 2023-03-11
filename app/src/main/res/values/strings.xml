@@ -52,8 +52,8 @@
   <string name="ImportTitle">Grab the following from the clipboard?</string>
   <string name="ExportButtonTitle">Export Cells</string>
   <string name="ExportTitle">Send the following to the clipboard</string>
-  <string name="AddAutoCell">Add Auto Cell</string>
-  <string name="AddTeleopCell">Add Teleop Cell</string>
+  <string name="AddAutoCell">Add Auto</string>
+  <string name="AddTeleopCell">Add Teleop</string>
   <string name="PrefDebug_tile">Pref Debug Menu</string>
   <string name="TableDefaultTitle">Unknown Side</string>
   <string name="enter_text_for_button_1">Enter text for button 1</string>
@@ -84,5 +84,6 @@
   <string name="TeamSelectType">TeamSelect</string>
   <string name="TitleType">Title</string>
   <string name="TeamMatchType">TeamMatch</string>
+  <string name="enter_the_help_text">Enter the Help Text</string>
 
 </resources>
