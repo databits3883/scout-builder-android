@@ -1,7 +1,5 @@
 <resources>
   <string name="app_name">Scout Builder</string>
-  <string name="yes_no">YesNo</string>
-  <string name="counter">counter</string>
   <string name="json_string">{"Cells":3,"cellContainers":[{"Cell_Number":0,"Cell_Type":"YesNo","param":{"Cell_Default":1,"Cell_Max":10,"Cell_Min":0,"Cell_Type":"YesNo"}},{"Cell_Number":1,"Cell_Type":"Counter","param":{"Cell_Default":1,"Cell_Max":10,"Cell_Min":0,"Cell_Type":"Counter"}},{"Cell_Number":2,"Cell_Type":"Segment","param":{"Cell_Segment_Labels":["1","2","3","4","5","6"],"Cell_Segments":6,"Cell_Type":"Segment"}},{"Cell_Number":3,"Cell_Type":"List","param":{"Cell_Entry_Labels":["Java","C++","Labview"],"Cell_Total_Entries":3,"Cell_Type":"List"}}],"Dark_Theme":false,"Page_Title":"Page Title","Version":0.1}</string>
   <string name="decrement">decrement</string>
   <string name="unrecognized_cell_type">Unknown Cell Type</string>
@@ -73,5 +71,18 @@
   <string name="preview">Preview</string>
   <string name="ListAdd">Add Item</string>
   <string name="ImagebuttonContentDesc">Cone/Cube/X Image button</string>
+  <string name="tables_disabled">Tables Disabled</string>
+  <string name="tables_enabled">Tables Enabled</string>
+  <string name="crowd_role">Crowd Page Selected</string>
+  <string name="pit_role">Pit Page Selected</string>
+  <string name="two_column">2 column Enabled</string>
+  <string name="one_column">1 column Enabled</string>
+  <string name="DialogEdit">Complete Edit</string>
+  <string name="edit_mode">Edit mode</string>
+  <string name="change_team_color">Change team color</string>
+  <string name="page_settings">Page Settings</string>
+  <string name="TeamSelectType">TeamSelect</string>
+  <string name="TitleType">Title</string>
+  <string name="TeamMatchType">TeamMatch</string>
 
 </resources>

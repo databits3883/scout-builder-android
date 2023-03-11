@@ -1,6 +1,5 @@
 package com.databits.scoutbuilder;
 
-import android.Manifest;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -12,39 +11,40 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
-
 import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
+import com.databits.scoutbuilder.adapter.RecyclerAdapter;
+import com.databits.scoutbuilder.adapter.RecyclerItemClickListener;
+import com.databits.scoutbuilder.adapter.SimpleItemTouchHelperCallback;
 import com.databits.scoutbuilder.dialogs.CounterDialog;
 import com.databits.scoutbuilder.dialogs.ListDialog;
 import com.databits.scoutbuilder.dialogs.PageSettingsDialog;
 import com.databits.scoutbuilder.dialogs.SegmentDialog;
+import com.databits.scoutbuilder.dialogs.TeamMatchDialog;
+import com.databits.scoutbuilder.dialogs.TeamSelectDialog;
 import com.databits.scoutbuilder.dialogs.TextboxDialog;
 import com.databits.scoutbuilder.dialogs.YesNoDialog;
 import com.databits.scoutbuilder.model.Cell;
 import com.databits.scoutbuilder.model.CellParam;
-import com.databits.scoutbuilder.adapter.RecyclerAdapter;
-import com.databits.scoutbuilder.adapter.SimpleItemTouchHelperCallback;
 import com.preference.PowerPreference;
 import com.preference.Preference;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -61,13 +61,14 @@ import permissions.dispatcher.RuntimePermissions;
 public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNoDialogListener,
     CounterDialog.CounterDialogListener, SegmentDialog.SegmentDialogListener,
     ListDialog.ListDialogListener, TextboxDialog.TextboxDialogListener,
-    PageSettingsDialog.PageSettingsDialogListener {
+    PageSettingsDialog.PageSettingsDialogListener, TeamMatchDialog.TeamMatchDialogListener, TeamSelectDialog.TeamSelectDialogListener {
 
     private static final String TAG = "MainActivity";
     private static final int NONE = 0;
     private static final int AUTO = 1;
     private static final int TELEOP = 2;
     private static final int BOTH = 3;
+    private static final int EDIT = 4;
 
     Preference preference = PowerPreference.getDefaultFile();
     ItemTouchHelper.Callback callbackTop;
@@ -83,7 +84,6 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
     private RecyclerView mRecyclerViewTop;
     private RecyclerView mRecyclerViewBot;
     private ClipboardManager clipboard;
-    private boolean[] checkedTables;
     private int table_status;
     List<Cell> cellList = new ArrayList<>();
 
@@ -94,35 +94,52 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
         MenuItem top_add = menu.findItem(R.id.action_add_top);
         MenuItem bot_add = menu.findItem(R.id.action_add_bot);
 
-        // Table Status is used to determine which table to display and what buttons
-        table_status = preference.getInt("table_status", BOTH);
-        switch (table_status) {
-            case AUTO:
-                top_add.setVisible(true);
-                bot_add.setVisible(false);
-                top_add.setTitle("Add Auto Cell");
-                break;
-            case TELEOP:
-                top_add.setVisible(false);
-                bot_add.setVisible(true);
-                top_add.setTitle("Add Teleop Cell");
-                break;
-            case BOTH:
-                top_add.setVisible(true);
-                bot_add.setVisible(true);
-                bot_add.setTitle("Add Teleop Cell");
-                top_add.setTitle("Add Auto Cell");
-                break;
-            case NONE:
-            default:
-                top_add.setVisible(true);
-                bot_add.setVisible(false);
-                top_add.setTitle("Add Cell");
-                break;
+        if (preference.getBoolean("edit_mode", false)) {
+            menu.findItem(R.id.edit_mode).setTitle("Edit Mode On");
+        } else {
+            menu.findItem(R.id.edit_mode).setTitle("Edit Mode Off");
         }
 
-        // Save table status for future use
-        preference.putInt("table_status", table_status);
+        // Table Status is used to determine which table to display and what buttons
+        table_status = preference.getInt("table_status", BOTH);
+
+        if (preference.getBoolean("edit_mode", false)) {
+            top_add.setVisible(true);
+            top_add.setTitle("Edit Mode");
+            top_add.setEnabled(false);
+            bot_add.setVisible(false);
+        } else {
+            switch (table_status) {
+                case AUTO:
+                    top_add.setVisible(true);
+                    bot_add.setVisible(false);
+                    top_add.setTitle("Add Auto");
+                    break;
+                case TELEOP:
+                    top_add.setVisible(false);
+                    bot_add.setVisible(true);
+                    top_add.setTitle("Add Teleop");
+                    break;
+                case BOTH:
+                    top_add.setVisible(true);
+                    bot_add.setVisible(true);
+                    bot_add.setTitle("Add Teleop");
+                    top_add.setTitle("Add Auto");
+                    break;
+                case EDIT:
+                    top_add.setVisible(true);
+                    top_add.setTitle("Edit Mode");
+                    top_add.setEnabled(false);
+                    bot_add.setVisible(false);
+                    break;
+                case NONE:
+                default:
+                    top_add.setVisible(true);
+                    top_add.setTitle("Add Cell");
+                    bot_add.setVisible(false);
+                    break;
+            }
+        }
 
         return true;
     }
@@ -144,12 +161,12 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
         String[] bottitles = {"Left\nSide", "Teleop\nCenter Side", "Right\nSide"};
 
         tables = new TableLayout[]{
-            topTables[0].findViewById(R.id.inner_table),
-            topTables[1].findViewById(R.id.inner_table),
-            topTables[2].findViewById(R.id.inner_table),
             botTables[0].findViewById(R.id.inner_table),
             botTables[1].findViewById(R.id.inner_table),
             botTables[2].findViewById(R.id.inner_table),
+            topTables[0].findViewById(R.id.inner_table),
+            topTables[1].findViewById(R.id.inner_table),
+            topTables[2].findViewById(R.id.inner_table),
         };
 
         // Set Table Auto/Teleop titles
@@ -238,8 +255,6 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
                                 }
                                 break;
                         }
-
-
                     });
                 }
             }
@@ -262,6 +277,8 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
                 updateTableColor(table, R.color.map_blue);
             }
         }
+
+        testItems(0);
 
         mRecyclerViewTop.setAdapter(mAdapterTop);
         mRecyclerViewBot.setAdapter(mAdapterBot);
@@ -290,6 +307,55 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
             mItemTouchHelperTop.attachToRecyclerView(null);
             mItemTouchHelperBot.attachToRecyclerView(null);
         }
+
+        RecyclerView.ItemDecoration itemDecoration = new
+            DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
+        mRecyclerViewTop.addItemDecoration(itemDecoration);
+        mRecyclerViewBot.addItemDecoration(itemDecoration);
+    }
+
+    private void editor(RecyclerView recyclerView, RecyclerAdapter adapter, boolean enabled) {
+        boolean isTop = recyclerView == mRecyclerViewTop;
+
+        if (enabled) {
+            recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, recyclerView,
+                new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                        // TODO: Implement
+                    }
+
+                    @Override public void onItemClick(View view, int position) {
+                        Cell cell = adapter.mCell.get(position);
+                        popupLauncher(cell.getType(), cell.getCellId(), position, isTop);
+                    }
+
+                    @Override
+                    public void onLongItemClick(View view, int position) {
+                        //Cell cell = adapter.mCell.get(position);
+                        //if (cell != null) {
+                        //    clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                        //    ClipData clip = ClipData.newPlainText("Cell", cell.toString());
+                        //    clipboard.setPrimaryClip(clip);
+                        //}
+                    }
+                }));
+        } else {
+            recyclerView.removeOnItemTouchListener(new RecyclerItemClickListener(this, recyclerView,
+                new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override public void onItemClick(View view, int position) {
+
+                    }
+
+                    @Override public void onLongItemClick(View view, int position) {
+
+                    }
+
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    }
+                }));
+        }
     }
 
     private void testItems(int cells) {
@@ -301,28 +367,34 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
             CellParam cellParam = new CellParam(cellType);
             switch (cellType) {
                 case "YesNo":
-                    cellParam.setCellType(getString(R.string.YesNoType));
+                    cellParam.setType(getString(R.string.YesNoType));
+                    cellParam.setHelpText("This is a YesNo text");
                     break;
                 case "Counter":
-                    cellParam.setCellType(getString(R.string.CounterType));
-                    cellParam.setCellDefault(3);
-                    cellParam.setCellMax(5);
-                    cellParam.setCellMin(0);
-                    cellParam.setCellUnit(1);
+                    cellParam.setType(getString(R.string.CounterType));
+                    cellParam.setDefault(3);
+                    cellParam.setMax(5);
+                    cellParam.setMin(0);
+                    cellParam.setUnit(1);
+                    cellParam.setHelpText("This is a Counter text");
+                    break;
                 case "Segment":
-                    cellParam.setCellType(getString(R.string.SegmentType));
-                    cellParam.setCellSegments(6);
-                    cellParam.setCellSegmentLabels(Arrays.asList("One", "2", "Three", "4", "Five", "6"));
+                    cellParam.setType(getString(R.string.SegmentType));
+                    cellParam.setSegments(6);
+                    cellParam.setSegmentLabels(Arrays.asList("One", "2", "Three", "4", "Five", "6"));
+                    cellParam.setHelpText("This is a Segment text");
                     break;
                 case "List":
-                    cellParam.setCellType(getString(R.string.ListType));
-                    cellParam.setCellTotalEntries(3);
-                    cellParam.setCellEntryLabels(Arrays.asList("Java", "C++", "Labview"));
+                    cellParam.setType(getString(R.string.ListType));
+                    cellParam.setTotalEntries(3);
+                    cellParam.setEntryLabels(Arrays.asList("Java", "C++", "Labview"));
+                    cellParam.setHelpText("This is a List text");
                     break;
                 case "Text":
-                    cellParam.setCellType(getString(R.string.TextType));
-                    cellParam.setCellTextHidden(false);
-                    cellParam.setCellTextHint("Enter life here");
+                    cellParam.setType(getString(R.string.TextType));
+                    cellParam.setTextHidden(false);
+                    cellParam.setTextHint("Enter life here");
+                    cellParam.setHelpText("This is a Text text");
                     break;
             }
             Cell cell = new Cell(i, cellTitles[i], cellType, cellParam);
@@ -351,7 +423,7 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
         mRecyclerViewBot.setAdapter(mAdapterBot);
     }
 
-    private void tableSorter(int table_status) {
+    public void tableSorter(int table_status) {
         RecyclerView recyclerViewTop = findViewById(R.id.recycler_view_top);
         ViewGroup.LayoutParams topParam = recyclerViewTop.getLayoutParams();
         ConstraintLayout constraintLayout = findViewById(R.id.Main_layout);
@@ -431,6 +503,42 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
         supportInvalidateOptionsMenu();
     }
 
+    // Use values from popup to create new recycler view item
+    public void popupLauncher(String cellType, int realPos, int pos, boolean isTop) {
+        switch (cellType) {
+            case "YesNo":
+                showYesNoDialog(preference.getString(realPos + "_title_value", "Title"),
+                    preference.getString(realPos + "_help_value"), pos, realPos, isTop);
+                break;
+            case "Counter":
+                showCounterDialog(preference.getString(realPos + "_title_value", "Title"),
+                    preference.getString(realPos + "_help_value"), pos, realPos, isTop);
+                break;
+            case "Segment":
+                showSegmentDialog(preference.getString(realPos + "_title_value", "Title"),
+                    preference.getString(realPos + "_help_value"), pos, realPos, isTop);
+                break;
+            case "List":
+                showListDialog(preference.getString(realPos + "_title_value", "Title"),
+                    preference.getString(realPos + "_help_value"), pos, realPos, isTop);
+                break;
+            case "Text":
+                showTextboxDialog(preference.getString(realPos + "_title_value", "Title"),
+                    preference.getString(realPos + "_help_value"), pos, realPos, isTop);
+                break;
+            case "TeamSelect":
+                showTeamSelectDialog(preference.getString(1 + "_title_value", "Title"),
+                    preference.getString(realPos + "_help_value"), pos, realPos, isTop);
+                break;
+            case "Title":
+                showTeamMatchDialog(preference.getString(1 + "_title_value", "Title"),
+                    preference.getString(realPos + "_help_value"), pos, realPos, isTop);
+                break;
+            case "Table":
+                break;
+        }
+    }
+
     private void updateTableColor(TableLayout table, int colorResId/*, int textColor*/) {
         TableRow row = (TableRow) table.getChildAt(0);
         row.setBackgroundColor(ContextCompat.getColor(this, colorResId));
@@ -439,27 +547,22 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
     }
 
     // import cells from json string
-    public void import_cells(String optional_json) {
+    public void import_cells(String optional_json, RecyclerView mRecyclerView) {
         Moshi moshi = new Moshi.Builder().build();
         JsonAdapter<RecyclerAdapter> jsonAdapter = moshi.adapter(RecyclerAdapter.class);
+        RecyclerAdapter mRecyclerViewAdapter;
         try {
             RecyclerAdapter config = jsonAdapter.fromJson(optional_json);
-            mAdapterTop = new RecyclerAdapter(Objects.requireNonNull(config).mCell);
-            mAdapterBot = new RecyclerAdapter(Objects.requireNonNull(config).mCell);
-            mRecyclerViewTop.setAdapter(mAdapterTop);
-            mRecyclerViewBot.setAdapter(mAdapterBot);
+            mRecyclerViewAdapter = new RecyclerAdapter(Objects.requireNonNull(config).mCell);
+            mRecyclerView.setAdapter(mRecyclerViewAdapter);
             Log.d(TAG, "import: " + optional_json);
         } catch (IOException e) {
             Log.e(TAG, "Error parsing JSON", e);
-            mAdapterTop = new RecyclerAdapter(Collections.emptyList());
-            mAdapterBot = new RecyclerAdapter(Collections.emptyList());
+            mRecyclerViewAdapter = new RecyclerAdapter(Collections.emptyList());
         }
-        mAdapterTop.notifyDataSetChanged();
-        mAdapterBot.notifyDataSetChanged();
-
+        mRecyclerViewAdapter.notifyItemRangeInserted(0, mAdapterTop.getItemCount());
     }
 
-    @NeedsPermission({android.Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE})
     public void save_json() {
         Moshi moshi = new Moshi.Builder().build();
         JsonAdapter<RecyclerAdapter> jsonAdapter = moshi.adapter(RecyclerAdapter.class);
@@ -483,42 +586,31 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
     public String export_string() {
         Moshi moshi = new Moshi.Builder().build();
         JsonAdapter<RecyclerAdapter> jsonAdapter = moshi.adapter(RecyclerAdapter.class);
+
+        int table = preference.getInt("table_status", BOTH);
         String jsonTop = jsonAdapter.toJson(mAdapterTop);
         String jsonBot = jsonAdapter.toJson(mAdapterBot);
-
-        Log.d(TAG, "export: " + jsonTop);
-        Log.d(TAG, "export: " + jsonBot);
-        return jsonTop;
-    }
-
-    // Use values from popup to create new recycler view item
-    public void popupLauncher(String cellType, boolean isTop) {
-        switch (cellType) {
-            case "YesNo":
-                showYesNoDialog(preference.getString(1 + "_title_value", "Title"), 1, isTop);
-                break;
-            case "Counter":
-                showCounterDialog(preference.getString(1 + "_title_value", "Title"), 1, isTop);
-                break;
-            case "Segment":
-                showSegmentDialog(preference.getString(1 + "_title_value", "Title"), 1, isTop);
-                break;
-            case "List":
-                showListDialog(preference.getString(1 + "_title_value", "Title"), 1, isTop);
-                break;
-            case "Text":
-                showTextboxDialog(preference.getString(1 + "_title_value", "Title"), 1, isTop);
-                break;
-            case "Table":
-                break;
+        Log.d(TAG, "export String: " + jsonTop);
+        Log.d(TAG, "export String: " + jsonBot);
+        // Choose which recycler view to export
+        switch (table) {
+            case NONE:
+                return jsonTop;
+            case BOTH:
+                return jsonTop + "^" + jsonBot;
+            default:
+                return "Error: No table selected";
         }
-
     }
 
     public String exportTable() {
         // Export the table as a string
         StringBuilder export = new StringBuilder();
         for (TableLayout table : tables) {
+            // Append a ^ between table 3 and 4
+            if (table == tables[3]) {
+                export.append("^");
+            }
             // 0 is the title row, so start at 1
             for (int i = 1; i < table.getChildCount(); i++) {
                 TableRow row = (TableRow) table.getChildAt(i);
@@ -540,6 +632,9 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
                     // Append the id to the export string with a comma separator except for the last table in the list
                     if (table == tables[tables.length - 1] && i == table.getChildCount() - 1 && j == row.getChildCount() - 1) {
                         export.append(id);
+                    // Don't append a comma after the last item in the first table as welll
+                    } else if (table == tables[tables.length - 4] && i == table.getChildCount() - 1 && j == row.getChildCount() - 1) {
+                        export.append(id);
                     } else {
                         export.append(id).append(",");
                     }
@@ -549,12 +644,23 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
         return export.toString();
     }
 
+    // Save the current recycler view items to clipboard
+    public String saveToClipboard() {
+        String cells = export_string();
+        String jsonTable = exportTable();
+        String json = cells + "^" + jsonTable;
+        ClipData clip = ClipData.newPlainText("json", json);
+        clipboard.setPrimaryClip(clip);
+        //Toast.makeText(this, "Saved to clipboard", Toast.LENGTH_SHORT).show();
+        return json;
+    }
+
     public void createItem(RecyclerAdapter mAdapter, RecyclerView mRecyclerView, Cell newCell) {
         List<Cell> cells = new ArrayList<>();
         cells.add(newCell);
         mAdapter.mCell.addAll(cells);
         mRecyclerView.setAdapter(mAdapter);
-        mAdapter.notifyDataSetChanged();
+        mAdapter.notifyItemInserted(mAdapter.mCell.size());
     }
 
     // Handle menu options
@@ -599,68 +705,19 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
             }
         }
 
-        if (id == R.id.action_reorder) {
-            boolean reorder = preference.getBoolean("reorder", false);
-
-            // Toggle and update the text
-            if (!reorder) {
-                item.setTitle("Reordering On");
-                preference.setBoolean("reorder", true);
-                mItemTouchHelperTop.attachToRecyclerView(mRecyclerViewTop);
-                mItemTouchHelperBot.attachToRecyclerView(mRecyclerViewBot);
-            } else {
-                item.setTitle("Reordering Off");
-                preference.setBoolean("reorder", false);
-                mItemTouchHelperTop.attachToRecyclerView(null);
-                mItemTouchHelperBot.attachToRecyclerView(null);
-            }
-        }
-        if (id == R.id.action_hide_table) {
-            // Open a dialog to hide tables array
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Configure 2023 Tables");
-            // Create a list of tables to remove
-            checkedTables = new boolean[curTables.length];
-            for (int i = 0; i < curTables.length; i++) {
-                checkedTables[i] = preference.getBoolean(curTables[i] + "_checked", true);
-            }
-            builder.setMultiChoiceItems(curTables, checkedTables, (dialog, which, isChecked) ->
-                            checkedTables[which] = isChecked)
-                    .setPositiveButton("OK", (dialog, id1) -> {
-                        if (checkedTables[0] && checkedTables[1]) {
-                            table_status = BOTH;
-                        } else if (checkedTables[0]) {
-                            table_status = AUTO;
-                        } else if (checkedTables[1]) {
-                            table_status = TELEOP;
-                        } else {
-                            table_status = NONE;
-                        }
-                        tableSorter(table_status);
-                        preference.putInt("table_status", table_status);
-                        for (int i = 0; i < curTables.length; i++) {
-                            preference.putBoolean(curTables[i] + "_checked", checkedTables[i]);
-                        }
-
-                    });
-
-            AlertDialog dialog = builder.create();
-            dialog.show();
-        }
-
-        if (id == R.id.action_launch) {
-            showPageSettingsDialog("test");
+        if (id == R.id.action_page_settings) {
+            showPageSettingsDialog("Page Settings");
         }
 
         if (id == R.id.action_export) {
-            String json = export_string();
+            String fullJson = saveToClipboard();
 
             // Make a dialog with text that can be copied
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle(R.string.ExportTitle);
             // Create a TextView to display the export string
             TextView textView = new TextView(this);
-            textView.setText(json);
+            textView.setText(fullJson);
 
             // Set the TextView to be focusable and selectable
             textView.setFocusable(true);
@@ -671,18 +728,34 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
             builder.setView(textView);
 
             // Create a ClipData object to hold the text
-            ClipData clip_export_json = ClipData.newPlainText("label", json);
-
-            // Send the ClipData to the clipboard
-            clipboard.setPrimaryClip(clip_export_json);
+            ClipData clip_export_json = ClipData.newPlainText("Json Export", fullJson);
 
             builder.setPositiveButton(R.string.ExportButtonTitle, (dialog, which) -> {
+                // Send the ClipData to the clipboard
                 clipboard.setPrimaryClip(clip_export_json);
                 save_json();
+                //saveToClipboard();
                 dialog.dismiss();
             });
             builder.setNegativeButton(getString(R.string.cancel), (dialog, which) -> dialog.dismiss());
             builder.show();
+        }
+
+        if (id == R.id.edit_mode) {
+            boolean editMode = preference.getBoolean("edit_mode", false);
+            preference.setBoolean("edit_mode", !editMode);
+
+            if (!editMode) {
+                editor(mRecyclerViewTop, mAdapterTop, true);
+                editor(mRecyclerViewBot, mAdapterBot, true);
+                item.setTitle("Edit Mode On");
+            } else {
+                editor(mRecyclerViewTop, mAdapterTop, false);
+                editor(mRecyclerViewBot, mAdapterBot, false);
+                item.setTitle("Edit Mode Off");
+            }
+
+            invalidateOptionsMenu();
         }
 
         if (id == R.id.action_import) {
@@ -708,7 +781,16 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
                     // Get the first item on the clipboard
                     ClipData.Item clips = clip_import_json.getItemAt(0);
 
-                    import_cells(clips.getText().toString());
+                    String top = clips.getText().toString().split("\\^")[0];
+                    String bot = clips.getText().toString().split("\\^")[1];
+                    String topTable = exportTable().split("\\^")[0];
+                    String botTable = exportTable().split("\\^")[1];
+
+                    Toast.makeText(this, topTable, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, botTable, Toast.LENGTH_SHORT).show();
+
+                    import_cells(top, mRecyclerViewTop);
+                    import_cells(bot, mRecyclerViewBot);
                 }
 
                 dialog.dismiss();
@@ -717,45 +799,18 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
             builder.show();
         }
 
-        if (id == R.id.action_columns) {
-            boolean grid = preference.getBoolean("grid", true);
-
-            // Toggle and update the text
-            if (grid) {
-                mRecyclerViewTop.setLayoutManager(new LinearLayoutManager(this));
-                mRecyclerViewBot.setLayoutManager(new LinearLayoutManager(this));
-                item.setTitle("2 Column mode off");
-                preference.setBoolean("grid", false);
-            } else {
-                mRecyclerViewTop.setLayoutManager(new GridLayoutManager(this, 2));
-                mRecyclerViewBot.setLayoutManager(new GridLayoutManager(this, 2));
-                item.setTitle("2 Column mode on");
-                preference.setBoolean("grid", true);
-            }
-        }
         // Create a dialog with a list of cell types
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.CellBuilderDialogTitle);
 
         if (id == R.id.action_add_top) {
-            builder.setItems(cellTypes, (dialog, which) -> popupLauncher(cellTypes[which], true));
+            builder.setItems(cellTypes, (dialog, which) -> popupLauncher(cellTypes[which],mRecyclerViewTop.getChildCount(), mRecyclerViewTop.getChildCount(),true));
             builder.show();
         }
 
         if (id == R.id.action_add_bot) {
-            builder.setItems(cellTypes, (dialog, which) -> popupLauncher(cellTypes[which], false));
+            builder.setItems(cellTypes, (dialog, which) -> popupLauncher(cellTypes[which],mRecyclerViewBot.getChildCount(), mRecyclerViewBot.getChildCount(), false));
             builder.show();
-        }
-
-        if (id == R.id.action_dark_mode) {
-            // Night mode switch
-            if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
-                preference.setInt("night_mode", AppCompatDelegate.MODE_NIGHT_NO);
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-            } else {
-                preference.setInt("night_mode", AppCompatDelegate.MODE_NIGHT_YES);
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-            }
         }
 
         return super.onOptionsItemSelected(item);
@@ -775,80 +830,179 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
         args.putString("title", title);
         args.putInt("id", viewId);
         args.putBoolean("location", location);
+        args.putInt("real_id", realViewId);
+        args.putString("help", help);
         dialog.setArguments(args);
         dialog.show(getSupportFragmentManager().beginTransaction(), "TextboxDialog");
     }
 
-    public void showListDialog(String title, int viewId, boolean location) {
+    public void showListDialog(String title, String help, int viewId, int realViewId, boolean location) {
         DialogFragment dialog = new ListDialog();
         Bundle args = new Bundle();
         args.putString("title", title);
         args.putInt("id", viewId);
         args.putBoolean("location", location);
+        args.putInt("real_id", realViewId);
+        args.putString("help", help);
         dialog.setArguments(args);
         dialog.show(getSupportFragmentManager().beginTransaction(), "ListDialog");
     }
 
-    private void showSegmentDialog(String title, int viewId, boolean location) {
+    private void showSegmentDialog(String title, String help, int viewId, int realViewId, boolean location) {
         DialogFragment dialog = new SegmentDialog();
         Bundle args = new Bundle();
         args.putString("title", title);
         args.putInt("id", viewId);
         args.putBoolean("location", location);
+        args.putInt("real_id", realViewId);
+        args.putString("help", help);
         dialog.setArguments(args);
         dialog.show(getSupportFragmentManager().beginTransaction(), "SegmentDialog");
     }
 
-    private void showCounterDialog(String title, int viewId, boolean location) {
+    private void showCounterDialog(String title, String help, int viewId, int realViewId, boolean location) {
         DialogFragment dialog = new CounterDialog();
         Bundle args = new Bundle();
         args.putString("title", title);
         args.putInt("id", viewId);
         args.putBoolean("location", location);
+        args.putInt("real_id", realViewId);
+        args.putString("help", help);
         dialog.setArguments(args);
         dialog.show(getSupportFragmentManager().beginTransaction(), "CounterDialog");
     }
 
-    public void showYesNoDialog(String title, int viewId, boolean location) {
+    public void showYesNoDialog(String title, String help, int viewId, int realViewId, boolean location) {
         DialogFragment dialog = new YesNoDialog();
         Bundle args = new Bundle();
         args.putString("title", title);
         args.putInt("id", viewId);
         args.putBoolean("location", location);
+        args.putInt("real_id", realViewId);
+        args.putString("help", help);
         dialog.setArguments(args);
         dialog.show(getSupportFragmentManager().beginTransaction(), "YesNoDialog");
     }
 
     @Override
-    public void onYesNoDialogPositiveClick(Cell newCell, boolean location) {
+    public void onYesNoDialogPositiveClick(Cell newCell, boolean location, int position, int realPosition) {
         RecyclerAdapter mAdapter = location ? mAdapterTop : mAdapterBot;
         RecyclerView mRecyclerView = location ? mRecyclerViewTop : mRecyclerViewBot;
-        createItem(mAdapter, mRecyclerView, newCell);
+
+        String locationString = location ? "top" : "bot";
+
+        if (!preference.getBoolean("edit_mode", false)) {
+            createItem(mAdapter, mRecyclerView, newCell);
+        } else {
+            // Cell is null if we want to delete the cell
+            if (newCell != null) {
+                Cell curCell = mAdapter.mCell.get(position);
+                curCell.setTitle(newCell.getTitle());
+                curCell.setParam(newCell.getParam());
+                mAdapter.notifyItemChanged(position);
+            } else {
+                preference.remove(locationString + "_" + position + "_title_value");
+                preference.remove(locationString + "_" + position + "_help_value");
+                mAdapter.mCell.remove(position);
+                mAdapter.notifyItemRemoved(position);
+            }
+        }
     }
 
     @Override
-    public void onCounterDialogPositiveClick(Cell newCell, boolean location) {
+    public void onCounterDialogPositiveClick(Cell newCell, boolean location, int position, int realPosition) {
         RecyclerAdapter mAdapter = location ? mAdapterTop : mAdapterBot;
         RecyclerView mRecyclerView = location ? mRecyclerViewTop : mRecyclerViewBot;
-        createItem(mAdapter, mRecyclerView, newCell);
+        if (!preference.getBoolean("edit_mode", false)) {
+            createItem(mAdapter, mRecyclerView, newCell);
+        } else {
+            // Cell is null if we want to delete the cell
+            if (newCell != null) {
+                Cell curCell = mAdapter.mCell.get(position);
+                curCell.setTitle(newCell.getTitle());
+                curCell.setParam(newCell.getParam());
+                mAdapter.notifyItemChanged(position);
+            } else {
+                preference.remove(position + "_default_picker_value");
+                preference.remove(position + "_min_picker_value");
+                preference.remove(position + "_max_picker_value");
+                preference.remove(position + "_unit_picker_value");
+                preference.remove(position + "_title_value");
+                preference.remove(position + "_help_value");
+                mAdapter.mCell.remove(position);
+                mAdapter.notifyItemRemoved(position);
+            }
+        }
     }
 
-    @Override public void onSegmentDialogPositiveClick(Cell newCell, boolean location) {
+    @Override public void onSegmentDialogPositiveClick(Cell newCell, boolean location, int position) {
         RecyclerAdapter mAdapter = location ? mAdapterTop : mAdapterBot;
         RecyclerView mRecyclerView = location ? mRecyclerViewTop : mRecyclerViewBot;
-        createItem(mAdapter, mRecyclerView, newCell);
+        if (!preference.getBoolean("edit_mode", false)) {
+            createItem(mAdapter, mRecyclerView, newCell);
+        } else {
+            // Cell is null if we want to delete the cell
+            if (newCell != null) {
+                Cell curCell = mAdapter.mCell.get(position);
+                curCell.setTitle(newCell.getTitle());
+                curCell.setParam(newCell.getParam());
+                mAdapter.notifyItemChanged(position);
+            } else {
+                for (int i = 0; i < preference.getInt(position + "_segment_count"); i++) {
+                    preference.remove(1 + "_segment_text_" + i);
+                }
+                preference.remove(position + "_segment_count");
+                preference.remove(position + "_title_value");
+                preference.remove(position + "_help_value");
+                mAdapter.mCell.remove(position);
+                mAdapter.notifyItemRemoved(position);
+            }
+        }
     }
 
-    @Override public void onListDialogPositiveClick(Cell newCell, boolean location) {
+    @Override public void onListDialogPositiveClick(Cell newCell, boolean location, int position) {
         RecyclerAdapter mAdapter = location ? mAdapterTop : mAdapterBot;
         RecyclerView mRecyclerView = location ? mRecyclerViewTop : mRecyclerViewBot;
-        createItem(mAdapter, mRecyclerView, newCell);
+        if (!preference.getBoolean("edit_mode", false)) {
+            createItem(mAdapter, mRecyclerView, newCell);
+        } else {
+            // Cell is null if we want to delete the cell
+            if (newCell != null) {
+                Cell curCell = mAdapter.mCell.get(position);
+                curCell.setTitle(newCell.getTitle());
+                curCell.setParam(newCell.getParam());
+                mAdapter.notifyItemChanged(position);
+            } else {
+                // TODO: Remove all list items in ListDialog directly
+                preference.remove(position + "_list_count");
+                preference.remove(position + "_title_value");
+                preference.remove(position + "_help_value");
+                mAdapter.mCell.remove(position);
+                mAdapter.notifyItemRemoved(position);
+            }
+        }
     }
 
-    @Override public void onTextboxDialogPositiveClick(Cell newCell, boolean location) {
+    @Override public void onTextboxDialogPositiveClick(Cell newCell, boolean location, int position) {
         RecyclerAdapter mAdapter = location ? mAdapterTop : mAdapterBot;
         RecyclerView mRecyclerView = location ? mRecyclerViewTop : mRecyclerViewBot;
-        createItem(mAdapter, mRecyclerView, newCell);
+        if (!preference.getBoolean("edit_mode", false)) {
+            createItem(mAdapter, mRecyclerView, newCell);
+        } else {
+            // Cell is null if we want to delete the cell
+            if (newCell != null) {
+                Cell curCell = mAdapter.mCell.get(position);
+                curCell.setTitle(newCell.getTitle());
+                curCell.setParam(newCell.getParam());
+                mAdapter.notifyItemChanged(position);
+            } else {
+                preference.remove(position + "_hint_value");
+                preference.remove(position + "_title_value");
+                preference.remove(position + "_help_value");
+                mAdapter.mCell.remove(position);
+                mAdapter.notifyItemRemoved(position);
+            }
+        }
     }
 
     @Override public void onPageSettingsDialogPositiveClick(Cell newCell, boolean location) {

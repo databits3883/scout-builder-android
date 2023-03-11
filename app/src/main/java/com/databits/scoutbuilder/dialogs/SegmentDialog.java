@@ -31,7 +31,7 @@ public class SegmentDialog extends DialogFragment {
 
 
   public interface SegmentDialogListener {
-    void onSegmentDialogPositiveClick(Cell newCell, boolean location);
+    void onSegmentDialogPositiveClick(Cell newCell, boolean location, int id);
   }
 
   SegmentDialogListener listener;
@@ -102,6 +102,8 @@ public class SegmentDialog extends DialogFragment {
       // Sets visibility after user changes the segment count
       for (int i = 0; i < buttons.length; i++) {
         buttons[i].setVisibility(i < value ? View.VISIBLE : View.GONE);
+        String saved = preference.getString(1 + "_segment_text_" + i );
+        buttons[i].setText(saved);
       }
     });
 
@@ -122,6 +124,8 @@ public class SegmentDialog extends DialogFragment {
 
       for (int i = 0; i < segment_texts.length; i++) {
         segment_texts[i].setVisibility(i < segment_count.get() ? View.VISIBLE : View.GONE);
+        String saved = preference.getString(viewId + "_segment_text_" + i);
+        segment_texts[i].setText(saved);
       }
 
       builder.setTitle(R.string.SegmentTextTitle);
@@ -132,6 +136,7 @@ public class SegmentDialog extends DialogFragment {
         for (int i = 0; i < segment_count.get(); i++) {
           String enteredText = segment_texts[i].getText().toString();
           segment_labels.add(enteredText);
+          preference.setString(1 + "_segment_text_" + i, enteredText);
           buttons[i].setText(enteredText);
         }
         dialog.dismiss();
@@ -169,20 +174,27 @@ public class SegmentDialog extends DialogFragment {
     // Pass null as the parent view because its going in the dialog layout
     builder.setView(v)
         // Add action buttons
-        .setPositiveButton(R.string.DialogAdd, (dialog, id) -> {
+        .setPositiveButton(textSelector(), (dialog, id) -> {
           // Create cell object to be returned to the activity
           String cellType = getString(R.string.SegmentType);
           CellParam cellParam = new CellParam(cellType);
-          cellParam.setCellType(cellType);
+          cellParam.setType(cellType);
           String cellTitle = picker_title.getText().toString();
 
-          cellParam.setCellSegments(segment_count.get());
-          cellParam.setCellSegmentLabels(segment_labels);
+          cellParam.setSegments(segment_count.get());
+
+          if (segment_labels.size() == 0) {
+            // 1 because the user shouldn't see segment 0
+            for (int i = 1; i < segment_count.get(); i++) {
+              segment_labels.add(String.valueOf(i));
+            }
+          }
+          cellParam.setSegmentLabels(segment_labels);
 
           preference.setString(1 + "_title_value", cellTitle);
           Cell newCell = new Cell(viewId,picker_title.getText().toString(), cellType, cellParam);
 
-          listener.onSegmentDialogPositiveClick(newCell, bundle.getBoolean("location"));
+          listener.onSegmentDialogPositiveClick(newCell, bundle.getBoolean("location"), viewId);
         })
         .setNegativeButton(getString(R.string.cancel), (dialog, id) -> {
           if (SegmentDialog.this.getDialog() != null) {
@@ -190,6 +202,10 @@ public class SegmentDialog extends DialogFragment {
           }
         });
     return builder.create();
+  }
+
+  public String textSelector() {
+    return preference.getBoolean("edit_mode") ? getString(R.string.DialogEdit) : getString(R.string.DialogAdd);
   }
 
   public String getTitle(View v) {

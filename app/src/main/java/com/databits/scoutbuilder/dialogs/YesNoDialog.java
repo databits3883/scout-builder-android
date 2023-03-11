@@ -7,22 +7,34 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.AppCompatButton;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 import com.databits.scoutbuilder.R;
 import com.databits.scoutbuilder.model.Cell;
 import com.databits.scoutbuilder.model.CellParam;
 import com.preference.PowerPreference;
 import com.preference.Preference;
+import com.skydoves.balloon.ArrowOrientation;
+import com.skydoves.balloon.ArrowPositionRules;
+import com.skydoves.balloon.Balloon;
+import com.skydoves.balloon.BalloonAnimation;
+import com.skydoves.balloon.BalloonSizeSpec;
 
 public class YesNoDialog extends DialogFragment {
   Bundle bundle;
   Preference preference = PowerPreference.getDefaultFile();
 
+  int viewId;
+  int realId;
+  boolean location;
+
   public interface YesNoDialogListener {
-    void onYesNoDialogPositiveClick(Cell newCell, boolean location);
+    void onYesNoDialogPositiveClick(Cell newCell, boolean location, int position, int realId);
   }
 
   YesNoDialogListener listener;
@@ -48,13 +60,35 @@ public class YesNoDialog extends DialogFragment {
     // Get the layout inflater
     LayoutInflater inflater = requireActivity().getLayoutInflater();
 
+    Balloon.Builder helpBuilder = new Balloon.Builder(requireContext())
+        .setArrowSize(10)
+        .setArrowOrientation(ArrowOrientation.TOP)
+        .setArrowPositionRules(ArrowPositionRules.ALIGN_BALLOON)
+        .setArrowPosition(0.5f)
+        .setWidth(BalloonSizeSpec.WRAP)
+        .setHeight(BalloonSizeSpec.WRAP)
+        .setPadding(6)
+        .setTextSize(20f)
+        .setCornerRadius(4f)
+        .setAlpha(0.8f)
+        .setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+        .setBalloonAnimation(BalloonAnimation.FADE);
+
     bundle = getArguments();
     // Inflate and set the layout for the dialog
     View v = inflater.inflate(R.layout.popup_yesno, null);
+    viewId = bundle.getInt("id");
+    realId = bundle.getInt("real_id");
+    location = bundle.getBoolean("location");
 
-    String title = getTitle(v);
+    String title = getTitle(location, realId);
+    String help = getHelp(location, realId);
+
+    helpBuilder.setText(help);
 
     TextView picker_title = v.findViewById(R.id.popup_title_text);
+    TextView picker_help = v.findViewById(R.id.popup_help_text);
+    ImageButton helpIcon = v.findViewById(R.id.help_button);
     TextView exampleTitle = v.findViewById(R.id.popup_title_example);
 
     // Set default title to both TextViews
@@ -63,6 +97,28 @@ public class YesNoDialog extends DialogFragment {
 
     // Automatically bring up the keyboard
     picker_title.requestFocus();
+
+    helpIcon.setOnClickListener(v1 -> {
+      helpBuilder.build().showAlignBottom(helpIcon);
+    });
+
+    picker_help.addTextChangedListener(new TextWatcher() {
+      @Override
+      public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+      }
+
+      @Override
+      public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+      }
+
+      @Override
+      public void afterTextChanged(Editable s) {
+        if (s.length() > 0) {
+          helpBuilder.setText(s.toString());
+        }
+      }
+    });
 
     // Set the title of the example to the title of the picker as it types
     picker_title.addTextChangedListener(new TextWatcher() {
@@ -82,17 +138,39 @@ public class YesNoDialog extends DialogFragment {
       }
     });
 
+    AppCompatButton deleteButton = v.findViewById(R.id.popup_delete_button);
+    if (preference.getBoolean("edit_mode")) {
+      deleteButton.setVisibility(View.VISIBLE);
+      deleteButton.setOnClickListener(v1 -> {
+        listener.onYesNoDialogPositiveClick(null, location, viewId, realId);
+        if (YesNoDialog.this.getDialog() != null) {
+          YesNoDialog.this.getDialog().cancel();
+        }
+      });
+    }
+
     // Pass null as the parent view because its going in the dialog layout
     builder.setView(v)
         // Add action buttons
-        .setPositiveButton(getString(R.string.DialogAdd), (dialog, id) -> {
+        .setPositiveButton(textSelector(), (dialog, id) -> {
           // Create cell object to be returned to the activity
-          String cellType = "YesNo";
+          String cellType = getString(R.string.YesNoType);
+          String newTitle = picker_title.getText().toString();
+          String newHelp = picker_help.getText().toString();
           CellParam cellParam = new CellParam(cellType);
-          cellParam.setCellType(cellType);
-          Cell newCell = new Cell(bundle.getInt("id"),picker_title.getText().toString(), cellType, cellParam);
+          cellParam.setType(cellType);
+          cellParam.setHelpText(newHelp);
+          Cell newCell = new Cell(bundle.getInt("id"),newTitle, cellType, cellParam);
 
-          listener.onYesNoDialogPositiveClick(newCell, bundle.getBoolean("location"));
+          if (location) {
+            preference.putString("top_" + viewId + "_title_value", newTitle);
+            preference.putString("top_" + viewId + "_help_value", newHelp);
+          } else {
+            preference.putString("bot_" + viewId + "_title_value", newTitle);
+            preference.putString("bot_" + viewId + "_help_value", newHelp);
+          }
+
+          listener.onYesNoDialogPositiveClick(newCell, location, viewId, realId);
         })
         .setNegativeButton(getString(R.string.cancel), (dialog, id) -> {
           if (YesNoDialog.this.getDialog() != null) {
@@ -102,9 +180,31 @@ public class YesNoDialog extends DialogFragment {
     return builder.create();
   }
 
-  public String getTitle(View v) {
-    TextView picker_title = v.findViewById(R.id.popup_title_text);
-    String savedTitle = bundle.getString("title");
-    return savedTitle;
+  public String textSelector() {
+    return preference.getBoolean("edit_mode") ? getString(R.string.DialogEdit) : getString(R.string.DialogAdd);
+  }
+
+  public String getTitle(boolean location, int viewId) {
+    if (!preference.getBoolean("edit_mode")) {
+      return bundle.getString("title");
+    } else {
+      if (location) {
+        return preference.getString("top_" + viewId + "_title_value");
+      } else {
+        return preference.getString("bot_" + viewId + "_title_value");
+      }
+    }
+  }
+
+  public String getHelp(boolean location, int viewId) {
+    if (!preference.getBoolean("edit_mode")) {
+      return bundle.getString("help");
+    } else {
+      if (location) {
+        return preference.getString("top_" + viewId + "_help_value");
+      } else {
+        return preference.getString("bot_" + viewId + "_help_value");
+      }
+    }
   }
 }

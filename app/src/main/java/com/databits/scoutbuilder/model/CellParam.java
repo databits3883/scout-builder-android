@@ -15,95 +15,101 @@ public class CellParam {
     private boolean cellTextHidden;
     private String cellTextHint;
 
+    private String helpText;
+
     public CellParam(String cellType) {
         this.cellType = cellType;
     }
 
-    public String getCellType() {
+    public String getType() {
         return cellType;
     }
 
-    public void setCellType(String cellType) {
+    public void setType(String cellType) {
         this.cellType = cellType;
     }
 
-    public int getCellDefault() {
+    public int getDefault() {
         return cellDefault;
     }
 
-    public void setCellDefault(int cellDefault) {
+    public void setDefault(int cellDefault) {
         this.cellDefault = cellDefault;
     }
 
-    public int getCellMax() {
+    public int getMax() {
         return cellMax;
     }
 
-    public void setCellMax(int cellMax) {
+    public void setMax(int cellMax) {
         this.cellMax = cellMax;
     }
 
-    public int getCellMin() {
+    public int getMin() {
         return cellMin;
     }
 
-    public void setCellMin(int cellMin) {
+    public void setMin(int cellMin) {
         this.cellMin = cellMin;
     }
 
-    public int getCellUnit() {
+    public int getUnit() {
         return cellUnit;
     }
 
-    public void setCellUnit(int cellUnit) {
+    public void setUnit(int cellUnit) {
         this.cellUnit = cellUnit;
     }
 
-    public int getCellSegments() {
+    public int getSegments() {
         return cellSegments;
     }
 
-    public void setCellSegments(int cellSegments) {
+    public void setSegments(int cellSegments) {
         this.cellSegments = cellSegments;
     }
 
-    public List<String> getCellSegmentLabels() {
+    public List<String> getSegmentLabels() {
         return cellSegmentLabels;
     }
 
-    public void setCellSegmentLabels(List<String> cellSegmentLabels) {
+    public void setSegmentLabels(List<String> cellSegmentLabels) {
         this.cellSegmentLabels = cellSegmentLabels;
     }
 
-    public int getCellTotalEntries() {
+    public int getTotalEntries() {
         return cellTotalEntries;
     }
 
-    public void setCellTotalEntries(int cellTotalEntries) {
+    public void setTotalEntries(int cellTotalEntries) {
         this.cellTotalEntries = cellTotalEntries;
     }
 
-    public List<String> getCellEntryLabels() {
+    public List<String> getEntryLabels() {
         return cellEntryLabels;
     }
 
-    public void setCellEntryLabels(List<String> cellEntryLabels) {
+    public void setEntryLabels(List<String> cellEntryLabels) {
         this.cellEntryLabels = cellEntryLabels;
     }
 
-    public boolean isCellTextHidden() {
+    public boolean isTextHidden() {
         return cellTextHidden;
     }
 
-    public void setCellTextHidden(boolean cellTextHidden) {
+    public void setTextHidden(boolean cellTextHidden) {
         this.cellTextHidden = cellTextHidden;
     }
 
-    public String getCellTextHint() {
+    public String getTextHint() {
         return cellTextHint;
     }
 
-    public void setCellTextHint(String cellTextHint) {
+    public void setTextHint(String cellTextHint) {
         this.cellTextHint = cellTextHint;
     }
+
+    public  String getHelpText() {return helpText;}
+
+    public void setHelpText(String helpText) {this.helpText = helpText;}
 }

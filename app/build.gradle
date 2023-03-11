@@ -61,8 +61,5 @@ dependencies {
     // Cross application value storage
     implementation 'com.github.AliAsadi:PowerPreference:2.1.1'
 
-    // Permissions handler
-    implementation "com.github.permissions-dispatcher:permissionsdispatcher:4.9.2"
-    annotationProcessor "com.github.permissions-dispatcher:permissionsdispatcher-processor:4.9.2"
-
+    implementation "com.github.skydoves:balloon:1.5.2"
 }
