@@ -2,7 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="match_parent">
 
     <com.addisonelliott.segmentedbutton.SegmentedButtonGroup
         android:id="@+id/buttonGroup_segments"
@@ -10,6 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:elevation="2dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -21,7 +22,8 @@
         app:sbg_ripple="false"
         app:sbg_selectedBackground="@color/accent_color"
         app:sbg_selectionAnimationDuration="250"
-        app:sbg_selectionAnimationInterpolator="fastOutSlowIn">
+        app:sbg_selectionAnimationInterpolator="fastOutSlowIn"
+        >
 
         <com.addisonelliott.segmentedbutton.SegmentedButton
             android:id="@+id/button_one"
@@ -32,7 +34,8 @@
             app:autoSizeTextType="uniform"
             app:sb_selectedTextColor="@color/white"
             app:sb_text="@string/one"
-            app:sb_textColor="@color/black" />
+            app:sb_textColor="@color/black"
+            />
 
         <com.addisonelliott.segmentedbutton.SegmentedButton
             android:id="@+id/button_two"
@@ -43,7 +46,8 @@
             app:autoSizeTextType="uniform"
             app:sb_selectedTextColor="@color/white"
             app:sb_text="@string/two"
-            app:sb_textColor="@color/black" />
+            app:sb_textColor="@color/black"
+            />
 
         <com.addisonelliott.segmentedbutton.SegmentedButton
             android:id="@+id/button_three"
@@ -55,7 +59,8 @@
             app:autoSizeTextType="uniform"
             app:sb_selectedTextColor="@color/white"
             app:sb_text="@string/three"
-            app:sb_textColor="@color/black" />
+            app:sb_textColor="@color/black"
+            />
 
         <com.addisonelliott.segmentedbutton.SegmentedButton
             android:id="@+id/button_four"
@@ -67,7 +72,8 @@
             app:autoSizeTextType="uniform"
             app:sb_selectedTextColor="@color/white"
             app:sb_text="@string/four"
-            app:sb_textColor="@color/black" />
+            app:sb_textColor="@color/black"
+            />
 
         <com.addisonelliott.segmentedbutton.SegmentedButton
             android:id="@+id/button_five"
@@ -79,7 +85,8 @@
             app:autoSizeTextType="uniform"
             app:sb_selectedTextColor="@color/white"
             app:sb_text="@string/five"
-            app:sb_textColor="@color/black" />
+            app:sb_textColor="@color/black"
+            />
 
         <com.addisonelliott.segmentedbutton.SegmentedButton
             android:id="@+id/button_six"
@@ -91,7 +98,8 @@
             app:autoSizeTextType="uniform"
             app:sb_selectedTextColor="@color/white"
             app:sb_text="@string/six"
-            app:sb_textColor="@color/black" />
+            app:sb_textColor="@color/black"
+            />
     </com.addisonelliott.segmentedbutton.SegmentedButtonGroup>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

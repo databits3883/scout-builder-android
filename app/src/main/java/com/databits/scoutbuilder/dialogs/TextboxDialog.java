@@ -7,20 +7,27 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 import com.databits.scoutbuilder.R;
+import com.databits.scoutbuilder.Utils;
 import com.databits.scoutbuilder.model.Cell;
 import com.databits.scoutbuilder.model.CellParam;
 import com.google.android.material.textfield.TextInputLayout;
 import com.preference.PowerPreference;
 import com.preference.Preference;
+import com.skydoves.balloon.Balloon;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class TextboxDialog extends DialogFragment {
   Bundle bundle;
+
+  int viewId;
+  int realId;
+  boolean location;
 
   Preference preference = PowerPreference.getDefaultFile();
 
@@ -28,10 +35,12 @@ public class TextboxDialog extends DialogFragment {
 
 
   public interface TextboxDialogListener {
-    void onTextboxDialogPositiveClick(Cell newCell, boolean location, int id);
+    void onTextboxDialogPositiveClick(Cell newCell, boolean location, int viewId, int realId);
   }
 
   TextboxDialogListener listener;
+
+  Utils utils;
 
   // Override the Fragment.onAttach() method to instantiate the NoticeDialogListener
   @Override
@@ -58,19 +67,33 @@ public class TextboxDialog extends DialogFragment {
     // Inflate and set the layout for the dialog
     View v = inflater.inflate(R.layout.popup_textbox, null);
 
-    String title = getTitle(v);
+    utils = new Utils(requireContext());
+
+    String title = utils.getTitle(location, realId, bundle);
+    String help = utils.getHelp(location, realId, bundle);
+
+    viewId = bundle.getInt("id");
+    realId = bundle.getInt("real_id");
+    location = bundle.getBoolean("location");
+
+    Balloon.Builder helpBuilder = utils.helpBuilder();
+    helpBuilder.setText(help);
 
     TextView picker_title = v.findViewById(R.id.popup_title_text);
     TextView exampleTitle = v.findViewById(R.id.popup_title_example);
+    TextView picker_help = v.findViewById(R.id.popup_help_text);
 
+    ImageButton helpIcon = v.findViewById(R.id.help_button);
     TextView picker_hint;
-
-    int viewId = bundle.getInt("id");
 
     // Sets the saved title and hint text
     popup_hint_example.set(v.findViewById(R.id.textbox_text_layout));
     picker_hint = v.findViewById(R.id.popup_title_hint_text);
-    popup_hint_example.get().setHint(preference.getString(viewId + "_hint_value"));
+    if (location) {
+      popup_hint_example.get().setHint(preference.getString("top_" + viewId + "_hint_value"));
+    } else {
+      popup_hint_example.get().setHint(preference.getString("bot_" + viewId + "_hint_value"));
+    }
 
     // Set default title to both TextViews
     picker_title.setText(title);
@@ -97,10 +120,32 @@ public class TextboxDialog extends DialogFragment {
       }
     });
 
+    picker_help.addTextChangedListener(new TextWatcher() {
+      @Override
+      public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+      }
+
+      @Override
+      public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+      }
+
+      @Override
+      public void afterTextChanged(Editable s) {
+        if (s.length() > 0) {
+          helpBuilder.setText(s.toString());
+        }
+      }
+    });
+
+
+    helpIcon.setOnClickListener(v1 -> helpBuilder.build().showAlignBottom(helpIcon));
+
+
     // Pass null as the parent view because its going in the dialog layout
     builder.setView(v)
         // Add action buttons
-        .setPositiveButton(textSelector(), (dialog, id) -> {
+        .setPositiveButton(utils.textSelector(), (dialog, id) -> {
           // Create cell object to be returned to the activity
           String cellType = getString(R.string.TextType);
           CellParam cellParam = new CellParam(cellType);
@@ -121,7 +166,7 @@ public class TextboxDialog extends DialogFragment {
           preference.setString(1 + "_title_value", cellTitle);
           Cell newCell = new Cell(viewId,picker_title.getText().toString(), cellType, cellParam);
 
-          listener.onTextboxDialogPositiveClick(newCell, bundle.getBoolean("location"), bundle.getInt("id"));
+          listener.onTextboxDialogPositiveClick(newCell, location, viewId, realId);
         })
         .setNegativeButton(getString(R.string.cancel), (dialog, id) -> {
           if (TextboxDialog.this.getDialog() != null) {
@@ -129,15 +174,5 @@ public class TextboxDialog extends DialogFragment {
           }
         });
     return builder.create();
-  }
-
-  public String textSelector() {
-    return preference.getBoolean("edit_mode") ? getString(R.string.DialogEdit) : getString(R.string.DialogAdd);
-  }
-
-  public String getTitle(View v) {
-    TextView picker_title = v.findViewById(R.id.popup_title_text);
-    String savedTitle = bundle.getString("title");
-    return savedTitle;
   }
 }

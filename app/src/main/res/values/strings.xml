@@ -65,7 +65,7 @@
   <string name="HintTextDefault">Hint Text</string>
   <string name="DefaultTitle">Enter a Title</string>
   <string name="example">Example</string>
-  <string name="HintTextTitle">Enter hint text\n(Optional)</string>
+  <string name="HintTextTitle">Enter hint text</string>
   <string name="SegmentButtonText">Configure Button Text</string>
   <string name="ListTitle">Add item to list</string>
   <string name="preview">Preview</string>
@@ -85,5 +85,6 @@
   <string name="TitleType">Title</string>
   <string name="TeamMatchType">TeamMatch</string>
   <string name="enter_the_help_text">Enter the Help Text</string>
+  <string name="delete_cell">Delete Cell?</string>
 
 </resources>

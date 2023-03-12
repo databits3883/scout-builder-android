@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:numberpicker="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
@@ -9,7 +10,7 @@
         android:id="@+id/popup_title_example"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="24dp"
         android:text="@string/example"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -20,42 +21,51 @@
     <include
         layout="@layout/ui_multi_segmented"
         android:id="@+id/multi_example"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
         android:layout_marginTop="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/popup_title_example"
-        app:layout_constraintVertical_bias="0.0"
         />
-
 
     <Button
         android:id="@+id/popup_text_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/SegmentButtonText"
+        android:layout_marginTop="16dp"
         android:backgroundTint="@color/accent_color"
+        android:text="@string/SegmentButtonText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline_h_60_percent"
+        app:layout_constraintTop_toBottomOf="@+id/segment_count_picker"
         />
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/DefaultTitle"
+        android:textAlignment="center"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toStartOf="@+id/guideline_v_50_percent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
 
     <!--This layout sets the size/dimensions of the box-->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/popup_edittext_layout"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:hint="@string/DefaultTitle"
         app:layout_constraintEnd_toStartOf="@+id/guideline_v_50_percent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/title"
         app:boxStrokeColor="@color/accent_color"
         app:counterTextColor="@color/accent_color"
         app:hintTextColor="@color/accent_color"
@@ -64,13 +74,16 @@
         <!--This is the actual edit text which takes the input-->
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/popup_title_text"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:imeOptions="actionDone"
             android:selectAllOnFocus="true"
             android:singleLine="true"
             android:textCursorDrawable="@null"
-            android:textSize="14sp"
+            android:textSize="34sp"
+            app:layout_constraintBottom_toTopOf="@+id/yes_no_example"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/filledTextField"
             />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -78,25 +91,20 @@
         android:id="@+id/segments_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
         android:text="@string/number_of_segments"
-        app:layout_constraintBottom_toBottomOf="@+id/segment_count_picker"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/guideline_v_50_percent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.175" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/popupWarning"
+        />
 
     <com.travijuu.numberpicker.library.NumberPicker
         android:id="@+id/segment_count_picker"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
-        android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/guideline_h_60_percent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/guideline_v_50_percent"
-        app:layout_constraintTop_toBottomOf="@+id/popup_edittext_layout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/segments_title"
         numberpicker:custom_layout="@layout/ui_number_picker"
         numberpicker:focusable="false"
         numberpicker:max="6"
@@ -112,7 +120,7 @@
         android:layout_marginTop="16dp"
         android:textAlignment="center"
         android:textSize="24sp"
-        app:layout_constraintEnd_toStartOf="@+id/guideline_v_50_percent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/popup_edittext_layout"
         />
@@ -124,12 +132,71 @@
         android:orientation="vertical"
         app:layout_constraintGuide_percent=".50" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline_h_60_percent"
+    <Button
+        android:id="@+id/popup_delete_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent=".5" />
+        android:layout_marginTop="16dp"
+        android:text="@string/delete_cell"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/multi_example"
+        />
+
+    <TextView
+        android:id="@+id/help_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/enter_the_help_text"
+        android:textAlignment="center"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/guideline_v_50_percent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/popup_help_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/guideline_v_50_percent"
+        app:layout_constraintTop_toBottomOf="@+id/help_text"
+        app:boxStrokeColor="@color/accent_color"
+        app:counterTextColor="@color/accent_color"
+        app:hintTextColor="@color/accent_color"
+        >
+
+        <!--This is the actual edit text which takes the input-->
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/popup_help_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:imeOptions="actionDone"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:textCursorDrawable="@null"
+            android:textSize="34sp"
+            app:layout_constraintBottom_toTopOf="@+id/yes_no_example"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/filledTextField"
+            />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <ImageButton
+        android:id="@+id/help_button"
+        android:layout_width="17dp"
+        android:layout_height="17dp"
+        android:layout_marginBottom="24dp"
+        android:background="@drawable/help_icon"
+        app:layout_constraintBottom_toTopOf="@+id/multi_example"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.75"
+        app:layout_constraintStart_toEndOf="@+id/popup_title_example"
+        />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

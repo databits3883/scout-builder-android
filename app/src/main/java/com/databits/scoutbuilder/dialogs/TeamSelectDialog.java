@@ -7,7 +7,9 @@ package com.databits.scoutbuilder.dialogs;
     import android.text.TextWatcher;
     import android.view.LayoutInflater;
     import android.view.View;
+    import android.widget.ArrayAdapter;
     import android.widget.ImageButton;
+    import android.widget.Spinner;
     import android.widget.TextView;
     import androidx.annotation.NonNull;
     import androidx.appcompat.app.AlertDialog;
@@ -24,6 +26,8 @@ package com.databits.scoutbuilder.dialogs;
     import com.skydoves.balloon.Balloon;
     import com.skydoves.balloon.BalloonAnimation;
     import com.skydoves.balloon.BalloonSizeSpec;
+    import java.util.Arrays;
+    import java.util.List;
 
 public class TeamSelectDialog extends DialogFragment {
   Bundle bundle;
@@ -82,6 +86,16 @@ public class TeamSelectDialog extends DialogFragment {
 
     TextView picker_help = v.findViewById(R.id.popup_help_text);
     ImageButton helpIcon = v.findViewById(R.id.help_button);
+
+    Spinner selSpinner = v.findViewById(R.id.teamSpinner);
+
+    List<String> entryLabels = Arrays.asList(
+        requireContext().getResources().getStringArray(R.array.team_list));
+    ArrayAdapter<String> selSpinnerArrayAdapter = new ArrayAdapter<>(requireContext(),
+        android.R.layout.simple_spinner_item, entryLabels);
+    selSpinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+    selSpinner.setAdapter(selSpinnerArrayAdapter);
+    selSpinner.setTag("TeamSpinner");
 
     helpIcon.setOnClickListener(v1 -> {
       helpBuilder.build().showAlignBottom(helpIcon);
