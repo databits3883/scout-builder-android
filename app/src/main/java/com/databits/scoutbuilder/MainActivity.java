@@ -533,7 +533,7 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
                 showTeamSelectDialog(preference.getString(1 + "_title_value", "Title"),
                     preference.getString(realPos + "_help_value"), pos, realPos, isTop);
                 break;
-            case "Title":
+            case "TeamMatch":
                 showTeamMatchDialog(preference.getString(1 + "_title_value", "Title"),
                     preference.getString(realPos + "_help_value"), pos, realPos, isTop);
                 break;
@@ -912,7 +912,8 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
     }
 
     @Override
-    public void onYesNoDialogPositiveClick(Cell newCell, boolean location, int position, int realPosition) {
+    public void onYesNoDialogPositiveClick(Cell newCell, boolean location, int position,
+        int realPosition) {
         RecyclerAdapter mAdapter = location ? mAdapterTop : mAdapterBot;
         RecyclerView mRecyclerView = location ? mRecyclerViewTop : mRecyclerViewBot;
 
@@ -937,7 +938,8 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
     }
 
     @Override
-    public void onCounterDialogPositiveClick(Cell newCell, boolean location, int position, int realPosition) {
+    public void onCounterDialogPositiveClick(Cell newCell, boolean location, int position,
+        int realPosition) {
         RecyclerAdapter mAdapter = location ? mAdapterTop : mAdapterBot;
         RecyclerView mRecyclerView = location ? mRecyclerViewTop : mRecyclerViewBot;
         if (!preference.getBoolean("edit_mode", false)) {
@@ -962,7 +964,8 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
         }
     }
 
-    @Override public void onSegmentDialogPositiveClick(Cell newCell, boolean location, int position) {
+    @Override public void onSegmentDialogPositiveClick(Cell newCell, boolean location, int position,
+        int realPosition) {
         RecyclerAdapter mAdapter = location ? mAdapterTop : mAdapterBot;
         RecyclerView mRecyclerView = location ? mRecyclerViewTop : mRecyclerViewBot;
         if (!preference.getBoolean("edit_mode", false)) {
@@ -987,7 +990,8 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
         }
     }
 
-    @Override public void onListDialogPositiveClick(Cell newCell, boolean location, int position) {
+    @Override public void onListDialogPositiveClick(Cell newCell, boolean location, int position,
+        int realId) {
         RecyclerAdapter mAdapter = location ? mAdapterTop : mAdapterBot;
         RecyclerView mRecyclerView = location ? mRecyclerViewTop : mRecyclerViewBot;
         if (!preference.getBoolean("edit_mode", false)) {
@@ -1010,7 +1014,8 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
         }
     }
 
-    @Override public void onTextboxDialogPositiveClick(Cell newCell, boolean location, int position) {
+    @Override public void onTextboxDialogPositiveClick(Cell newCell, boolean location, int position,
+        int realId) {
         RecyclerAdapter mAdapter = location ? mAdapterTop : mAdapterBot;
         RecyclerView mRecyclerView = location ? mRecyclerViewTop : mRecyclerViewBot;
         if (!preference.getBoolean("edit_mode", false)) {
@@ -1033,7 +1038,7 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
     }
 
     @Override public void onTeamSelectDialogPositiveClick(Cell newCell, boolean location, int position,
-        int realId) {
+        int realPosition) {
         RecyclerAdapter mAdapter = location ? mAdapterTop : mAdapterBot;
         RecyclerView mRecyclerView = location ? mRecyclerViewTop : mRecyclerViewBot;
         if (!preference.getBoolean("edit_mode", false)) {
@@ -1054,8 +1059,16 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
         }
     }
 
+    //public void createItem(RecyclerAdapter mAdapter, RecyclerView mRecyclerView, Cell newCell) {
+    //    List<Cell> cells = new ArrayList<>();
+    //    cells.add(newCell);
+    //    mAdapter.mCell.addAll(cells);
+    //    mRecyclerView.setAdapter(mAdapter);
+    //    mAdapter.notifyItemInserted(mAdapter.mCell.size());
+    //}
+
     @Override public void onTeamMatchDialogPositiveClick(Cell newCell, boolean location, int position,
-        int realId) {
+        int realPosition) {
         RecyclerAdapter mAdapter = location ? mAdapterTop : mAdapterBot;
         RecyclerView mRecyclerView = location ? mRecyclerViewTop : mRecyclerViewBot;
         if (!preference.getBoolean("edit_mode", false)) {
@@ -1071,6 +1084,7 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
                 preference.remove(position + "_help_value");
                 preference.remove(position + "_title_value");
                 mAdapter.mCell.remove(position);
+                mRecyclerView.setAdapter(mAdapter);
                 mAdapter.notifyItemRemoved(position);
             }
         }

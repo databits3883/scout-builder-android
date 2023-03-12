@@ -11,6 +11,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 import com.databits.scoutbuilder.R;
@@ -34,6 +35,11 @@ public class CounterDialog extends DialogFragment {
   int viewId;
   int realId;
   boolean location;
+
+  int max;
+  int min;
+  int def_value;
+  int unit;
 
   public interface CounterDialogListener {
     void onCounterDialogPositiveClick(Cell newCell, boolean location, int position, int realId);
@@ -90,10 +96,17 @@ public class CounterDialog extends DialogFragment {
     realId = bundle.getInt("real_id");
     location = bundle.getBoolean("location");
 
-    int max = preference.getInt(viewId + "_max_picker_value", 0);
-    int min = preference.getInt(viewId + "_min_picker_value", 0);
-    int def_value = preference.getInt(viewId + "_default_picker_value", min);
-    int unit = preference.getInt(viewId + "_unit_picker_value", 1);
+    if (location) {
+      max = preference.getInt("top_" + viewId + "_max_picker_value");
+      min = preference.getInt("top_" + viewId + "_min_picker_value");
+      def_value = preference.getInt("top_" + viewId + "_default_picker_value", min);
+      unit = preference.getInt("top_" + viewId + "_unit_picker_value", 1);
+    } else {
+      max = preference.getInt("bot_" + viewId + "_max_picker_value");
+      min = preference.getInt("bot_" + viewId + "_min_picker_value");
+      def_value = preference.getInt("bot_" + viewId + "_default_picker_value", min);
+      unit = preference.getInt("bot_" + viewId + "_unit_picker_value", 1);
+    }
 
     picker_example.setMin(min);
     picker_example.setMax(max);
@@ -120,15 +133,20 @@ public class CounterDialog extends DialogFragment {
     }
 
     picker_default.setValueChangedListener((value, action) -> {
-      int max_value = preference.getInt(viewId + "_max_picker_value");
-      int min_value = preference.getInt(viewId + "_min_picker_value");
-
+      if (location) {
+        max = preference.getInt("top_" + viewId + "_max_picker_value");
+        min = preference.getInt("top_" + viewId + "_min_picker_value");
+        preference.setInt("top_" + viewId + "_default_picker_value", value);
+      } else {
+        max = preference.getInt("bot_" + viewId + "_max_picker_value");
+        min = preference.getInt("bot_" + viewId + "_min_picker_value");
+        preference.setInt("bot_" + viewId + "_default_picker_value", value);
+      }
       picker_example.setMin(value);
       picker_example.setValue(value);
-      preference.setInt(viewId + "_default_picker_value", value);
-      if (min_value > value) {
+      if (min > value) {
         popup_warning.setText(R.string.CounterDefGreater);
-      } else if (max_value < value) {
+      } else if (max < value) {
         popup_warning.setText(R.string.CounterDefLess);
       } else {
         popup_warning.setText("");
@@ -136,16 +154,25 @@ public class CounterDialog extends DialogFragment {
     });
 
     picker_min.setValueChangedListener((value, action) -> {
-      int max_value = preference.getInt(viewId + "_max_picker_value");
+      if (location) {
+        max = preference.getInt("top_" + viewId + "_max_picker_value");
+        min = preference.getInt("top_" + viewId + "_min_picker_value");
+        def_value = preference.getInt("top_" + viewId + "_default_picker_value");
+        preference.setInt("top_" + viewId + "_min_picker_value", value);
+      } else {
+        max = preference.getInt("bot_" + viewId + "_max_picker_value");
+        min = preference.getInt("bot_" + viewId + "_min_picker_value");
+        def_value = preference.getInt("top_" + viewId + "_default_picker_value");
+        preference.setInt("bot_" + viewId + "_min_picker_value", value);
+      }
 
       picker_example.setMin(value);
       picker_example.setValue(value);
-      preference.setInt(viewId + "_min_picker_value", value);
-      if (max_value == value) {
+      if (max == value) {
         popup_warning.setText(R.string.CounterMaxEquals);
-      } else if (max_value <= value) {
+      } else if (max <= value) {
         popup_warning.setText(R.string.CounterMinLessEquals);
-      } else if (value < preference.getInt(viewId + "_default_picker_value")) {
+      } else if (value < def_value) {
         popup_warning.setText(R.string.CounterDefLess);
       } else {
         popup_warning.setText("");
@@ -153,14 +180,24 @@ public class CounterDialog extends DialogFragment {
     });
 
     picker_max.setValueChangedListener((value, action) -> {
-      int min_value = preference.getInt(viewId + "_min_picker_value");
+      if (location) {
+        max = preference.getInt("top_" + viewId + "_max_picker_value");
+        min = preference.getInt("top_" + viewId + "_min_picker_value");
+        def_value = preference.getInt("top_" + viewId + "_default_picker_value");
+        preference.setInt("top_" + viewId + "_max_picker_value", value);
+      } else {
+        max = preference.getInt("bot_" + viewId + "_max_picker_value");
+        min = preference.getInt("bot_" + viewId + "_min_picker_value");
+        def_value = preference.getInt("top_" + viewId + "_default_picker_value");
+        preference.setInt("bot_" + viewId + "_max_picker_value", value);
+      }
+
 
       picker_example.setMax(value);
       picker_example.setValue(value);
-      preference.setInt(viewId + "_max_picker_value", value);
-      if (min_value == value) {
+      if (min == value) {
         popup_warning.setText(R.string.CounterMaxEquals);
-      } else if (min_value >= value) {
+      } else if (min >= value) {
         popup_warning.setText(R.string.CounterMinGreaterEqual);
       } else {
         popup_warning.setText("");
@@ -174,9 +211,7 @@ public class CounterDialog extends DialogFragment {
     // Automatically bring up the keyboard
     picker_title.requestFocus();
 
-    helpIcon.setOnClickListener(v1 -> {
-      helpBuilder.build().showAlignBottom(helpIcon);
-    });
+    helpIcon.setOnClickListener(v1 -> helpBuilder.build().showAlignBottom(helpIcon));
 
     // Set the title of the example to the title of the picker as it types
     picker_title.addTextChangedListener(new TextWatcher() {
@@ -213,6 +248,18 @@ public class CounterDialog extends DialogFragment {
         }
       }
     });
+
+    AppCompatButton deleteButton = v.findViewById(R.id.popup_delete_button);
+    if (preference.getBoolean("edit_mode")) {
+      deleteButton.setVisibility(View.VISIBLE);
+      deleteButton.setOnClickListener(v1 -> {
+        listener.onCounterDialogPositiveClick(null, location, viewId, realId);
+        if (CounterDialog.this.getDialog() != null) {
+          CounterDialog.this.getDialog().cancel();
+        }
+      });
+    }
+
     // Pass null as the parent view because its going in the dialog layout
     builder.setView(v)
         // Add action buttons
@@ -232,9 +279,13 @@ public class CounterDialog extends DialogFragment {
           cellParam.setMax(new_max);
           cellParam.setMin(new_min);
           cellParam.setUnit(unit_value);
-          cellParam.setHelpText(newHelp);
+          if (!newHelp.isEmpty()) {
+            cellParam.setHelpText(newHelp);
+          } else {
+            cellParam.setHelpText("Default");
+          }
 
-          Cell newCell = new Cell(viewId,picker_title.getText().toString(), cellType, cellParam);
+          Cell newCell = new Cell(viewId,cellTitle, cellType, cellParam);
 
           if (location) {
             preference.setInt("top_" + viewId + "_max_picker_value", new_max);

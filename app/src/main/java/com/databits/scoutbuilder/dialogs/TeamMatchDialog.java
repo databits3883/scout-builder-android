@@ -121,11 +121,15 @@ public class TeamMatchDialog extends DialogFragment {
         // Add action buttons
         .setPositiveButton(textSelector(), (dialog, id) -> {
           // Create cell object to be returned to the activity
-          String cellType = getString(R.string.TeamSelectType);
+          String cellType = getString(R.string.TeamMatchType);
           String newHelp = picker_help.getText().toString();
           CellParam cellParam = new CellParam(cellType);
           cellParam.setType(cellType);
-          cellParam.setHelpText(newHelp);
+          if (!newHelp.isEmpty()) {
+            cellParam.setHelpText(newHelp);
+          } else {
+            cellParam.setHelpText("Default");
+          }
           Cell newCell = new Cell(bundle.getInt("id"),"title", cellType, cellParam);
 
           if (location) {

@@ -9,16 +9,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 import com.addisonelliott.segmentedbutton.SegmentedButton;
 import com.databits.scoutbuilder.R;
+import com.databits.scoutbuilder.Utils;
 import com.databits.scoutbuilder.model.Cell;
 import com.databits.scoutbuilder.model.CellParam;
 import com.preference.PowerPreference;
 import com.preference.Preference;
+import com.skydoves.balloon.Balloon;
 import com.travijuu.numberpicker.library.NumberPicker;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,14 +30,19 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class SegmentDialog extends DialogFragment {
   Bundle bundle;
 
+  int viewId;
+  int realId;
+  boolean location;
+
   Preference preference = PowerPreference.getDefaultFile();
 
-
   public interface SegmentDialogListener {
-    void onSegmentDialogPositiveClick(Cell newCell, boolean location, int id);
+    void onSegmentDialogPositiveClick(Cell newCell, boolean location, int viewId, int realId);
   }
 
   SegmentDialogListener listener;
+
+  Utils utils;
 
   // Override the Fragment.onAttach() method to instantiate the NoticeDialogListener
   @Override
@@ -61,15 +69,33 @@ public class SegmentDialog extends DialogFragment {
     // Inflate and set the layout for the dialog
     View v = inflater.inflate(R.layout.popup_segment, null);
 
-    String title = getTitle(v);
+    utils = new Utils(requireContext());
 
-    int viewId = bundle.getInt("id");
+    String title = utils.getTitle(location, realId, bundle);
+    String help = utils.getHelp(location, realId, bundle);
 
-    AtomicInteger segment_count =
-        new AtomicInteger(preference.getInt(viewId + "_segment_count", 2));
+    viewId = bundle.getInt("id");
+    realId = bundle.getInt("real_id");
+    location = bundle.getBoolean("location");
+
+    Balloon.Builder helpBuilder = utils.helpBuilder();
+    helpBuilder.setText(help);
+
+
+    AtomicInteger segment_count;
+    if (location) {
+      segment_count =
+          new AtomicInteger(preference.getInt("top_" + viewId + "_segment_count", 2));
+    } else {
+      segment_count =
+          new AtomicInteger(preference.getInt("bot_" + viewId + "_segment_count", 2));
+    }
 
     TextView picker_title = v.findViewById(R.id.popup_title_text);
     TextView exampleTitle = v.findViewById(R.id.popup_title_example);
+    TextView picker_help = v.findViewById(R.id.popup_help_text);
+
+    ImageButton helpIcon = v.findViewById(R.id.help_button);
 
     TextView popup_warning = v.findViewById(R.id.popupWarning);
     popup_warning.setText(R.string.SegmentWarning);
@@ -85,7 +111,6 @@ public class SegmentDialog extends DialogFragment {
         v.findViewById(R.id.button_six)
     };
 
-
     picker_segment_count.setValue(segment_count.get());
 
     // Sets visibility based on stored value
@@ -93,16 +118,26 @@ public class SegmentDialog extends DialogFragment {
       buttons[i].setVisibility(i < segment_count.get() ? View.VISIBLE : View.GONE);
     }
 
-
     picker_segment_count.setValueChangedListener((value, action) -> {
-      preference.setInt(viewId + "_segment_count", value);
+      if (location) {
+        preference.setInt("top_" + viewId + "_segment_count", value);
+      } else {
+        preference.setInt("bot_" + viewId + "_segment_count", value);
+      }
 
       segment_count.set(value);
 
       // Sets visibility after user changes the segment count
       for (int i = 0; i < buttons.length; i++) {
-        buttons[i].setVisibility(i < value ? View.VISIBLE : View.GONE);
-        String saved = preference.getString(1 + "_segment_text_" + i );
+        buttons[i].setVisibility(i < segment_count.get() ? View.VISIBLE : View.GONE);
+        String saved;
+        if (location) {
+          saved = preference.getString("top_" + viewId + "_segment_text_" + i,
+              String.valueOf((i + 1)));
+        } else {
+          saved = preference.getString("bot_" +  viewId + "_segment_text_" + i,
+              String.valueOf((i + 1)));
+        }
         buttons[i].setText(saved);
       }
     });
@@ -123,8 +158,15 @@ public class SegmentDialog extends DialogFragment {
       };
 
       for (int i = 0; i < segment_texts.length; i++) {
+        String saved;
         segment_texts[i].setVisibility(i < segment_count.get() ? View.VISIBLE : View.GONE);
-        String saved = preference.getString(viewId + "_segment_text_" + i);
+        if (location) {
+          saved = preference.getString("top_" + viewId + "_segment_text_" + i,
+              String.valueOf((i + 1)));
+        } else {
+          saved = preference.getString("bot_" +  viewId + "_segment_text_" + i,
+              String.valueOf((i + 1)));
+        }
         segment_texts[i].setText(saved);
       }
 
@@ -136,13 +178,20 @@ public class SegmentDialog extends DialogFragment {
         for (int i = 0; i < segment_count.get(); i++) {
           String enteredText = segment_texts[i].getText().toString();
           segment_labels.add(enteredText);
-          preference.setString(1 + "_segment_text_" + i, enteredText);
+          if (location) {
+            preference.setString("top_" + viewId + "_segment_text_" + i, enteredText);
+          } else {
+            preference.setString("bot_" + viewId + "_segment_text_" + i, enteredText);
+          }
+
           buttons[i].setText(enteredText);
         }
         dialog.dismiss();
       });
       AlertDialog dialog = builder.create();
       dialog.show();
+
+      helpIcon.setOnClickListener(v1 -> helpBuilder.build().showAlignBottom(helpIcon));
     });
 
 
@@ -171,30 +220,66 @@ public class SegmentDialog extends DialogFragment {
       }
     });
 
+    picker_help.addTextChangedListener(new TextWatcher() {
+      @Override
+      public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+      }
+
+      @Override
+      public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+      }
+
+      @Override
+      public void afterTextChanged(Editable s) {
+        if (s.length() > 0) {
+          helpBuilder.setText(s.toString());
+        }
+      }
+    });
+
     // Pass null as the parent view because its going in the dialog layout
     builder.setView(v)
         // Add action buttons
-        .setPositiveButton(textSelector(), (dialog, id) -> {
+        .setPositiveButton(utils.textSelector(), (dialog, id) -> {
           // Create cell object to be returned to the activity
           String cellType = getString(R.string.SegmentType);
           CellParam cellParam = new CellParam(cellType);
           cellParam.setType(cellType);
           String cellTitle = picker_title.getText().toString();
-
           cellParam.setSegments(segment_count.get());
 
-          if (segment_labels.size() == 0) {
+          String newHelp = picker_help.getText().toString();
+          if (!newHelp.isEmpty()) {
+            cellParam.setHelpText(newHelp);
+          } else {
+            cellParam.setHelpText("Default");
+          }
+
+          if (!(segment_labels.size() == 0)) {
             // 1 because the user shouldn't see segment 0
             for (int i = 1; i < segment_count.get(); i++) {
               segment_labels.add(String.valueOf(i));
             }
-          }
           cellParam.setSegmentLabels(segment_labels);
+          } else {
+            for (int i = 1; i < segment_count.get(); i++) {
+              segment_labels.add(String.valueOf(i));
+            }
+          }
 
-          preference.setString(1 + "_title_value", cellTitle);
-          Cell newCell = new Cell(viewId,picker_title.getText().toString(), cellType, cellParam);
+          cellParam.setSegmentLabels(segment_labels);
+          if (location) {
+            preference.setString("top_" + viewId + "_title_value", cellTitle);
+            preference.putString("top_" + viewId + "_help_value", newHelp);
+          } else {
+            preference.setString("bot_" + viewId + "_title_value", cellTitle);
+            preference.putString("bot_" + viewId + "_help_value", newHelp);
+          }
 
-          listener.onSegmentDialogPositiveClick(newCell, bundle.getBoolean("location"), viewId);
+          Cell newCell = new Cell(viewId,cellTitle, cellType, cellParam);
+
+          listener.onSegmentDialogPositiveClick(newCell, location, viewId, realId);
         })
         .setNegativeButton(getString(R.string.cancel), (dialog, id) -> {
           if (SegmentDialog.this.getDialog() != null) {
@@ -202,15 +287,5 @@ public class SegmentDialog extends DialogFragment {
           }
         });
     return builder.create();
-  }
-
-  public String textSelector() {
-    return preference.getBoolean("edit_mode") ? getString(R.string.DialogEdit) : getString(R.string.DialogAdd);
-  }
-
-  public String getTitle(View v) {
-    TextView picker_title = v.findViewById(R.id.popup_title_text);
-    String savedTitle = bundle.getString("title");
-    return savedTitle;
   }
 }

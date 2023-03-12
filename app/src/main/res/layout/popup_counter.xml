@@ -5,6 +5,17 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
+    <Button
+        android:id="@+id/popup_delete_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/delete_cell"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/number_counter_example"
+        />
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/popup_help_layout"
         android:layout_width="wrap_content"
@@ -63,11 +74,9 @@
         android:id="@+id/popup_title_example"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
         android:layout_marginTop="24dp"
         android:text="@string/example"
         android:textSize="20sp"
-        app:layout_constraintBottom_toTopOf="@+id/number_counter_example"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/number_counter_default"
@@ -90,18 +99,18 @@
         android:id="@+id/popup_edittext_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
         android:hint=""
         android:singleLine="true"
+        app:layout_constraintEnd_toStartOf="@+id/guideline_v_50_percent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/title"
         app:boxStrokeColor="@color/accent_color"
         app:counterTextColor="@color/accent_color"
         app:hintTextColor="@color/accent_color"
-        app:layout_constraintBottom_toTopOf="@+id/guideline_h_25_percent"
-        app:layout_constraintEnd_toStartOf="@+id/guideline_v_50_percent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/title">
+        >
 
         <!--This is the actual edit text which takes the input-->
         <com.google.android.material.textfield.TextInputEditText
@@ -115,7 +124,8 @@
             android:textSize="34sp"
             app:layout_constraintBottom_toTopOf="@+id/yes_no_example"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/filledTextField" />
+            app:layout_constraintStart_toStartOf="@+id/filledTextField"
+            />
     </com.google.android.material.textfield.TextInputLayout>
 
     <TextView
@@ -176,10 +186,10 @@
         android:id="@+id/number_counter_example"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/popup_title_example"
         numberpicker:custom_layout="@layout/ui_number_picker"
         numberpicker:focusable="false"
         numberpicker:max="99"

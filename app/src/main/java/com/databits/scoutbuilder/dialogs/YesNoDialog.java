@@ -90,9 +90,7 @@ public class YesNoDialog extends DialogFragment {
     // Automatically bring up the keyboard
     picker_title.requestFocus();
 
-    helpIcon.setOnClickListener(v1 -> {
-      helpBuilder.build().showAlignBottom(helpIcon);
-    });
+    helpIcon.setOnClickListener(v1 -> helpBuilder.build().showAlignBottom(helpIcon));
 
     picker_help.addTextChangedListener(new TextWatcher() {
       @Override
@@ -151,8 +149,14 @@ public class YesNoDialog extends DialogFragment {
           String newHelp = picker_help.getText().toString();
           CellParam cellParam = new CellParam(cellType);
           cellParam.setType(cellType);
-          cellParam.setHelpText(newHelp);
-          Cell newCell = new Cell(bundle.getInt("id"), newTitle, cellType, cellParam);
+
+          if (!newHelp.isEmpty()) {
+            cellParam.setHelpText(newHelp);
+          } else {
+            cellParam.setHelpText("Default");
+          }
+
+          Cell newCell = new Cell(viewId, newTitle, cellType, cellParam);
 
           if (location) {
             preference.putString("top_" + viewId + "_title_value", newTitle);

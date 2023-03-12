@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     >
 
   <Button
       android:id="@+id/popup_delete_button"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:layout_marginTop="8dp"
-      android:text="Delete Cell?"
+      android:layout_marginTop="24dp"
+      android:text="@string/delete_cell"
       android:visibility="gone"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/match_number"
+      app:layout_constraintTop_toBottomOf="@+id/team_match"
       />
 
   <TextView
@@ -46,7 +47,7 @@
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_marginTop="16dp"
-      android:text="Team             Match"
+      android:text="Team                      Match"
       android:textSize="24sp"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
@@ -61,44 +62,27 @@
       app:layout_constraintGuide_percent=".5"
       />
 
-  <TextView
-      android:id="@+id/team_number"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="9999"
-      android:textAlignment="center"
-      android:textSize="20sp"
-      app:layout_constraintEnd_toStartOf="@+id/guideline10"
-      app:layout_constraintHorizontal_bias="0.67"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/text_example"
-      />
-
-  <TextView
-      android:id="@+id/match_number"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="0"
-      android:textAlignment="center"
-      android:textSize="20sp"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintHorizontal_bias="0.34"
-      app:layout_constraintStart_toEndOf="@+id/guideline10"
-      app:layout_constraintTop_toBottomOf="@+id/text_example"
-      />
-
   <ImageButton
       android:id="@+id/help_button"
       android:layout_width="17dp"
       android:layout_height="17dp"
       android:layout_marginBottom="24dp"
       android:background="@drawable/help_icon"
-      app:layout_constraintBottom_toTopOf="@+id/text_example"
+      app:layout_constraintBottom_toTopOf="@+id/team_match"
       app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintHorizontal_bias="0.34"
+      app:layout_constraintHorizontal_bias="0.83"
       app:layout_constraintStart_toEndOf="@+id/popup_title_example"
       />
 
+  <include
+      layout="@layout/ui_team_match"
+      android:id="@+id/team_match"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/text_example"
+      />
 
   <com.google.android.material.textfield.TextInputLayout
       android:id="@+id/popup_help_layout"
