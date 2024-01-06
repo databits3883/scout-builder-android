@@ -175,7 +175,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                         inner.findViewById(R.id.button_six)
                     };
 
-                    for (int i = 0; i < segmentCount; i++) {
+                    for (int i = 0; i < segmentCount-1; i++) {
                         segmentLabels.add(cellParams.getSegmentLabels().get(i));
                     }
 
