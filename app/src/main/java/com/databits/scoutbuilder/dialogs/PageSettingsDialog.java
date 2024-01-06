@@ -66,13 +66,13 @@ public class PageSettingsDialog extends DialogFragment {
 
     SwitchCompat tablesSwitch = v.findViewById(R.id.tables_switch);
 
-    table_status = preference.getInt("table_status", BOTH);
+    table_status = preference.getInt("table_status", NONE);
 
     // set table status based on radio buttons
     SwitchCompat autoSwitch = v.findViewById(R.id.auto_button);
     SwitchCompat teleopSwitch = v.findViewById(R.id.teleop_button);
 
-    tablesSwitch.setChecked(preference.getBoolean("tables_mode", true) && table_status != NONE);
+    tablesSwitch.setChecked(preference.getBoolean("table_status") /*&& table_status != NONE*/);
     tablesSwitch.setOnClickListener(v1 -> {
       if (tablesSwitch.isChecked()) {
         tablesSwitch.setText(R.string.tables_enabled);
@@ -103,7 +103,7 @@ public class PageSettingsDialog extends DialogFragment {
     // Pass in the saved table settings
     checkedTables = new boolean[curTables.length];
     for (int i = 0; i < curTables.length; i++) {
-      checkedTables[i] = preference.getBoolean(curTables[i] + "_checked", true);
+      checkedTables[i] = preference.getBoolean(curTables[i] + "_checked", false);
     }
 
     // Turn on switch if table is checked
