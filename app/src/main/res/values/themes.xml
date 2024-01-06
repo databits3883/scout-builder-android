@@ -17,5 +17,16 @@
         <!-- AppCompat Switch coloring (Removing Holo colors) -->
         <item name="colorAccent">@color/accent_color</item>
         <item name="colorSwitchThumbNormal">@color/colorLightGray</item>
+
+        <item name="android:actionBarStyle">@style/Theme.ActionBar</item>
+        <item name="android:actionMenuTextColor">@color/white</item>
+    </style>
+
+    <style name="Theme.ActionBar" parent="Theme.scoutBuilder">
+        <item name="android:titleTextStyle">@style/Theme.ActionBar.Text</item>
+    </style>
+
+    <style name="Theme.ActionBar.Text" parent="@android:style/TextAppearance">
+        <item name="android:textColor">@color/white</item>
     </style>
 </resources>
