@@ -4,18 +4,21 @@
     android:id="@+id/main_menu">
 
     <item
-        android:id="@+id/action_add_top"
-        android:title="@string/AddAutoCell"
-        app:showAsAction="always" />
-
-    <item
-        android:id="@+id/action_add_bot"
+        android:id="@+id/action_add"
         android:title="@string/AddTeleopCell"
-        app:showAsAction="always" />
+        android:icon="@android:drawable/ic_menu_add"
+        app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/action_page_settings"
-        android:title="@string/page_settings"
+        android:id="@+id/edit_mode"
+        android:title="@string/edit_mode"
+        android:icon="@android:drawable/ic_menu_edit"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_export"
+        android:title="@string/export_menu"
+        android:icon="@android:drawable/ic_menu_share"
         app:showAsAction="ifRoom" />
 
     <item
@@ -24,13 +27,14 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/action_export"
-        android:title="@string/export_menu"
+        android:id="@+id/action_reset"
+        android:title="@string/reset_menu"
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/edit_mode"
-        android:title="@string/edit_mode"
+        android:id="@+id/action_page_settings"
+        android:title="@string/page_settings"
+        android:visible="true"
         app:showAsAction="never" />
 
     <item
@@ -44,7 +48,7 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/action_reset"
-        android:title="@string/reset_menu"
+        android:id="@+id/ac"
+        android:title="@string/PrefDebug_tile"
         app:showAsAction="never" />
 </menu>

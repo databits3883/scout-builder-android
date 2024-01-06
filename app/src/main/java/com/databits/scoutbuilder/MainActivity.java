@@ -86,8 +86,9 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
-        MenuItem top_add = menu.findItem(R.id.action_add_top);
-        MenuItem bot_add = menu.findItem(R.id.action_add_bot);
+        //MenuItem top_add = menu.findItem(R.id.action_add_top);
+        //MenuItem bot_add = menu.findItem(R.id.action_add_bot);
+        MenuItem addButton = menu.findItem(R.id.action_add);
 
         if (preference.getBoolean("edit_mode", false)) {
             menu.findItem(R.id.edit_mode).setTitle("Edit Mode On");
@@ -95,46 +96,49 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
             menu.findItem(R.id.edit_mode).setTitle("Edit Mode Off");
         }
 
+        //menu.findItem(R.id.)
+//        preference.setInt("table_status", NONE);
+//        preference.setBoolean("grid", false);
         // Table Status is used to determine which table to display and what buttons
-        table_status = preference.getInt("table_status", BOTH);
+//        table_status = preference.getInt("table_status", NONE);
 
-        if (preference.getBoolean("edit_mode", false)) {
-            top_add.setVisible(true);
-            top_add.setTitle("Edit Mode");
-            top_add.setEnabled(false);
-            bot_add.setVisible(false);
-        } else {
-            switch (table_status) {
-                case AUTO:
-                    top_add.setVisible(true);
-                    bot_add.setVisible(false);
-                    top_add.setTitle("Add Auto");
-                    break;
-                case TELEOP:
-                    top_add.setVisible(false);
-                    bot_add.setVisible(true);
-                    top_add.setTitle("Add Teleop");
-                    break;
-                case BOTH:
-                    top_add.setVisible(true);
-                    bot_add.setVisible(true);
-                    bot_add.setTitle("Add Teleop");
-                    top_add.setTitle("Add Auto");
-                    break;
-                case EDIT:
-                    top_add.setVisible(true);
-                    top_add.setTitle("Edit Mode");
-                    top_add.setEnabled(false);
-                    bot_add.setVisible(false);
-                    break;
-                case NONE:
-                default:
-                    top_add.setVisible(true);
-                    top_add.setTitle("Add Cell");
-                    bot_add.setVisible(false);
-                    break;
-            }
-        }
+        //if (preference.getBoolean("edit_mode", false)) {
+        //    top_add.setVisible(true);
+        //    top_add.setTitle("Edit Mode");
+        //    top_add.setEnabled(false);
+        //    bot_add.setVisible(false);
+        //} else {
+        //    switch (table_status) {
+        //        case AUTO:
+        //            top_add.setVisible(true);
+        //            bot_add.setVisible(false);
+        //            top_add.setTitle("Add Auto");
+        //            break;
+        //        case TELEOP:
+        //            top_add.setVisible(false);
+        //            bot_add.setVisible(true);
+        //            top_add.setTitle("Add Teleop");
+        //            break;
+        //        case BOTH:
+        //            top_add.setVisible(true);
+        //            bot_add.setVisible(true);
+        //            bot_add.setTitle("Add Teleop");
+        //            top_add.setTitle("Add Auto");
+        //            break;
+        //        case EDIT:
+        //            top_add.setVisible(true);
+        //            top_add.setTitle("Edit Mode");
+        //            top_add.setEnabled(false);
+        //            bot_add.setVisible(false);
+        //            break;
+        //        case NONE:
+        //        default:
+        //            top_add.setVisible(true);
+        //            top_add.setTitle("Add Cell");
+        //            bot_add.setVisible(false);
+        //            break;
+        //    }
+        //}
 
         return true;
     }
@@ -163,116 +167,117 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
             topTables[1].findViewById(R.id.inner_table),
             topTables[2].findViewById(R.id.inner_table),
         };
-
-        // Set Table Auto/Teleop titles
-        for (int i = 0; i < 3; i++) {
-            TextView topText = topTables[i].findViewById(R.id.table_title);
-            TextView botText = botTables[i].findViewById(R.id.table_title);
-            topText.setTextSize(20);
-            topText.setTextColor(Color.WHITE);
-            botText.setTextSize(20);
-            botText.setTextColor(Color.WHITE);
-            topText.setText(toptitles[i]);
-            botText.setText(bottitles[i]);
-        }
-
-        // Set on click listeners for all buttons to cycle between icons
-        // Uses the team color to determine which icon to use
-        for (TableLayout table : tables) {
-            for (int i = 1; i < table.getChildCount(); i++) {
-                TableRow row = (TableRow) table.getChildAt(i);
-                for (int j = 0; j < row.getChildCount(); j++) {
-                    ImageButton button = (ImageButton) row.getChildAt(j);
-
-                    if (i == 3) {
-                        button.setTag("Both");
-                    } else {
-                        if (j == 0) {
-                            button.setTag("Cone");
-                        } else if (j == 1) {
-                            button.setTag("Cube");
-                        } else if (j == 2) {
-                            button.setTag("Cone");
-                        }
-                    }
-
-                    button.setImageResource(R.drawable.android_x);
-                    final int[] counter = {1};
-                    button.setOnClickListener(v -> {
-                        boolean red = preference.getBoolean("isRedteam");
-                        Log.d(TAG, "onCreate: " + button.getId());
-                        String curTag = String.valueOf(button.getTag());
-                        switch (curTag) {
-                            case "Both":
-                                if (counter[0] == 0) {
-                                    button.setImageResource(R.drawable.android_x);
-                                    counter[0]++;
-                                } else if (counter[0] == 1) {
-                                    if (red) {
-                                        button.setImageResource(R.drawable.red_cube44);
-                                    } else {
-                                        button.setImageResource(R.drawable.cube44);
-                                    }
-                                    counter[0]++;
-                                } else if (counter[0] == 2) {
-                                    if (red) {
-                                        button.setImageResource(R.drawable.red_cone44);
-                                    } else {
-                                        button.setImageResource(R.drawable.cone44);
-                                    }
-                                    counter[0] = 0;
-                                }
-                                break;
-                            case "Cone":
-                                if (counter[0] == 0) {
-                                    button.setImageResource(R.drawable.android_x);
-                                    counter[0]++;
-                                } else if (counter[0] == 1) {
-                                    if (red) {
-                                        button.setImageResource(R.drawable.red_cone44);
-                                    } else {
-                                        button.setImageResource(R.drawable.cone44);
-                                    }
-                                    counter[0] = 0;
-                                }
-                                break;
-                            case "Cube":
-                                if (counter[0] == 0) {
-                                    button.setImageResource(R.drawable.android_x);
-                                    counter[0]++;
-                                } else if (counter[0] == 1) {
-                                    if (red) {
-                                        button.setImageResource(R.drawable.red_cube44);
-                                    } else {
-                                        button.setImageResource(R.drawable.cube44);
-                                    }
-                                    counter[0] = 0;
-                                }
-                                break;
-                        }
-                    });
-                }
-            }
-        }
+//
+//        // Set Table Auto/Teleop titles
+//        for (int i = 0; i < 3; i++) {
+//            TextView topText = topTables[i].findViewById(R.id.table_title);
+//            TextView botText = botTables[i].findViewById(R.id.table_title);
+//            topText.setTextSize(20);
+//            topText.setTextColor(Color.WHITE);
+//            botText.setTextSize(20);
+//            botText.setTextColor(Color.WHITE);
+//            topText.setText(toptitles[i]);
+//            botText.setText(bottitles[i]);
+//        }
+//
+//        // Set on click listeners for all buttons to cycle between icons
+//        // Uses the team color to determine which icon to use
+//        for (TableLayout table : tables) {
+//            for (int i = 1; i < table.getChildCount(); i++) {
+//                TableRow row = (TableRow) table.getChildAt(i);
+//                for (int j = 0; j < row.getChildCount(); j++) {
+//                    ImageButton button = (ImageButton) row.getChildAt(j);
+//
+//                    if (i == 3) {
+//                        button.setTag("Both");
+//                    } else {
+//                        if (j == 0) {
+//                            button.setTag("Cone");
+//                        } else if (j == 1) {
+//                            button.setTag("Cube");
+//                        } else if (j == 2) {
+//                            button.setTag("Cone");
+//                        }
+//                    }
+//
+//                    button.setImageResource(R.drawable.android_x);
+//                    final int[] counter = {1};
+//                    button.setOnClickListener(v -> {
+//                        boolean red = preference.getBoolean("isRedteam");
+//                        Log.d(TAG, "onCreate: " + button.getId());
+//                        String curTag = String.valueOf(button.getTag());
+//                        switch (curTag) {
+//                            case "Both":
+//                                if (counter[0] == 0) {
+//                                    button.setImageResource(R.drawable.android_x);
+//                                    counter[0]++;
+//                                } else if (counter[0] == 1) {
+//                                    if (red) {
+//                                        button.setImageResource(R.drawable.red_cube44);
+//                                    } else {
+//                                        button.setImageResource(R.drawable.cube44);
+//                                    }
+//                                    counter[0]++;
+//                                } else if (counter[0] == 2) {
+//                                    if (red) {
+//                                        button.setImageResource(R.drawable.red_cone44);
+//                                    } else {
+//                                        button.setImageResource(R.drawable.cone44);
+//                                    }
+//                                    counter[0] = 0;
+//                                }
+//                                break;
+//                            case "Cone":
+//                                if (counter[0] == 0) {
+//                                    button.setImageResource(R.drawable.android_x);
+//                                    counter[0]++;
+//                                } else if (counter[0] == 1) {
+//                                    if (red) {
+//                                        button.setImageResource(R.drawable.red_cone44);
+//                                    } else {
+//                                        button.setImageResource(R.drawable.cone44);
+//                                    }
+//                                    counter[0] = 0;
+//                                }
+//                                break;
+//                            case "Cube":
+//                                if (counter[0] == 0) {
+//                                    button.setImageResource(R.drawable.android_x);
+//                                    counter[0]++;
+//                                } else if (counter[0] == 1) {
+//                                    if (red) {
+//                                        button.setImageResource(R.drawable.red_cube44);
+//                                    } else {
+//                                        button.setImageResource(R.drawable.cube44);
+//                                    }
+//                                    counter[0] = 0;
+//                                }
+//                                break;
+//                        }
+//                    });
+//                }
+//            }
+//        }
 
         // Adds all 5 types of cells to both recycler views
         //testItems(5);
 
         // Sorts the tables based on saved Table Status
-        table_status = preference.getInt("table_status", BOTH);
+        table_status = preference.getInt("table_status", NONE);
         tableSorter(table_status);
 
         // Change the team color based on the saved value
-        if (preference.getBoolean("isRedteam")) {
-            for (TableLayout table : tables) {
-                updateTableColor(table, R.color.map_red);
-            }
-        } else {
-            for (TableLayout table : tables) {
-                updateTableColor(table, R.color.map_blue);
-            }
-        }
+//        if (preference.getBoolean("isRedteam")) {
+//            for (TableLayout table : tables) {
+//                updateTableColor(table, R.color.map_red);
+//            }
+//        } else {
+//            for (TableLayout table : tables) {
+//                updateTableColor(table, R.color.map_blue);
+//            }
+//        }
 
+//        NEEDED for some reason
         testItems(0);
 
         mRecyclerViewTop.setAdapter(mAdapterTop);
@@ -322,7 +327,9 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
 
                     @Override public void onItemClick(View view, int position) {
                         Cell cell = adapter.mCell.get(position);
-                        popupLauncher(cell.getType(), cell.getCellId(), position, isTop);
+                        if (cell != null) {
+                            popupLauncher(cell.getType(), cell.getCellId(), position, isTop);
+                        }
                     }
 
                     @Override
@@ -576,7 +583,7 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
         try {
             try (FileOutputStream stream = new FileOutputStream(file)) {
                 stream.write(jsonTop.getBytes());
-                stream.write(jsonBot.getBytes());
+//                stream.write(jsonBot.getBytes());
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -650,12 +657,11 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
     // Save the current recycler view items to clipboard
     public String saveToClipboard() {
         String cells = export_string();
-        String jsonTable = exportTable();
-        String json = cells + "^" + jsonTable;
-        ClipData clip = ClipData.newPlainText("json", json);
+//        String jsonTable = exportTable();
+        ClipData clip = ClipData.newPlainText("json", cells/* + "^" + jsonTable*/);
         clipboard.setPrimaryClip(clip);
         //Toast.makeText(this, "Saved to clipboard", Toast.LENGTH_SHORT).show();
-        return json;
+        return cells;
     }
 
     public void createItem(RecyclerAdapter mAdapter, RecyclerView mRecyclerView, Cell newCell) {
@@ -748,14 +754,27 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
             boolean editMode = preference.getBoolean("edit_mode", false);
             preference.setBoolean("edit_mode", !editMode);
 
-            if (!editMode) {
+            if (editMode) {
                 editor(mRecyclerViewTop, mAdapterTop, true);
                 editor(mRecyclerViewBot, mAdapterBot, true);
-                item.setTitle("Edit Mode On");
+//                for (TableLayout table : tables) {
+//                    updateTableColor(table, R.color.green_900);
+//                }
+                Toast.makeText(this, "Edit Mode turned on, select a cell to edit it", Toast.LENGTH_LONG).show();
             } else {
                 editor(mRecyclerViewTop, mAdapterTop, false);
                 editor(mRecyclerViewBot, mAdapterBot, false);
                 item.setTitle("Edit Mode Off");
+//                if (preference.getBoolean("isRedteam")) {
+//                    for (TableLayout table : tables) {
+//                        updateTableColor(table, R.color.map_red);
+//                    }
+//                } else {
+//                    for (TableLayout table : tables) {
+//                        updateTableColor(table, R.color.map_blue);
+//                    }
+//                }
+                Toast.makeText(this, "Edit Mode turned off", Toast.LENGTH_LONG).show();
             }
 
             invalidateOptionsMenu();
@@ -785,15 +804,15 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
                     ClipData.Item clips = clip_import_json.getItemAt(0);
 
                     String top = clips.getText().toString().split("\\^")[0];
-                    String bot = clips.getText().toString().split("\\^")[1];
-                    String topTable = exportTable().split("\\^")[0];
-                    String botTable = exportTable().split("\\^")[1];
+//                    String bot = clips.getText().toString().split("\\^")[1];
+//                    String topTable = exportTable().split("\\^")[0];
+//                    String botTable = exportTable().split("\\^")[1];
 
-                    Toast.makeText(this, topTable, Toast.LENGTH_SHORT).show();
-                    Toast.makeText(this, botTable, Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(this, topTable, Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(this, botTable, Toast.LENGTH_SHORT).show();
 
                     import_cells(top, mRecyclerViewTop);
-                    import_cells(bot, mRecyclerViewBot);
+//                    import_cells(bot, mRecyclerViewBot);
                 }
 
                 dialog.dismiss();
@@ -806,14 +825,31 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.CellBuilderDialogTitle);
 
-        if (id == R.id.action_add_top) {
-            builder.setItems(cellTypes, (dialog, which) -> popupLauncher(cellTypes[which],mRecyclerViewTop.getChildCount(), mRecyclerViewTop.getChildCount(),true));
+        if (id == R.id.action_add) {
+            builder.setItems(cellTypes, (dialog, which) -> popupLauncher(cellTypes[which],mRecyclerViewTop.getChildCount(), mRecyclerViewTop.getChildCount(), true));
             builder.show();
-        }
 
-        if (id == R.id.action_add_bot) {
-            builder.setItems(cellTypes, (dialog, which) -> popupLauncher(cellTypes[which],mRecyclerViewBot.getChildCount(), mRecyclerViewBot.getChildCount(), false));
-            builder.show();
+            // Add dialog for 2 tables
+//            AlertDialog.Builder addBuilder = new AlertDialog.Builder(this);
+//            AlertDialog.Builder typeBuilder = new AlertDialog.Builder(this);
+//            addBuilder.setTitle("Would you like to add a cell to the top");
+//
+//            addBuilder.setNeutralButton("Cancel", (dialog, which) -> {
+//                dialog.dismiss();
+//            });
+//            addBuilder.setPositiveButton("Bot", (dialog, which) -> {
+//                typeBuilder.setItems(cellTypes, (typeDialog, typeWhich) -> popupLauncher(cellTypes[typeWhich],mRecyclerViewBot.getChildCount(),
+//                    mRecyclerViewBot.getChildCount(), false));
+//                typeBuilder.show();
+//                dialog.dismiss();
+//            });
+//            addBuilder.setNegativeButton("Top", (dialog, which) -> {
+//                typeBuilder.setItems(cellTypes, (typeDialog, typeWhich) -> popupLauncher(cellTypes[typeWhich],mRecyclerViewTop.getChildCount(),
+//                    mRecyclerViewTop.getChildCount(),true));
+//                typeBuilder.show();
+//                dialog.dismiss();
+//            });
+//            addBuilder.show();
         }
 
         return super.onOptionsItemSelected(item);
