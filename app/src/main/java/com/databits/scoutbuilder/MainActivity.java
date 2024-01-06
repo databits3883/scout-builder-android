@@ -823,6 +823,10 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
         DialogFragment dialog = new TextboxDialog();
         Bundle args = new Bundle();
         args.putString("title", title);
+        args.putInt("id", 1);
+        args.putBoolean("location", false);
+        args.putInt("real_id", 1);
+        args.putString("help", "help");
         dialog.setArguments(args);
         dialog.show(getSupportFragmentManager().beginTransaction(), "PageSettingsDialog");
     }
