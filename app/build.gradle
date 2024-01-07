@@ -4,12 +4,12 @@ plugins {
 
 android {
     namespace 'com.databits.scoutbuilder'
-    compileSdk 32
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.databits.scoutbuilder"
         minSdk 26
-        targetSdk 32
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 
@@ -55,11 +55,18 @@ dependencies {
     // Number picker UI
     implementation 'com.github.travijuu:numberpicker:1.0.7'
 
-    // Material Theme Support
-    implementation 'com.google.android.material:material:1.7.0'
-
     // Cross application value storage
     implementation 'com.github.AliAsadi:PowerPreference:2.1.1'
 
     implementation "com.github.skydoves:balloon:1.5.2"
+
+    // Room components
+    implementation "androidx.room:room-runtime:2.6.1"
+    annotationProcessor "androidx.room:room-compiler:2.6.1"
+    androidTestImplementation "androidx.room:room-testing:2.6.1"
+
+    // Lifecycle components
+    implementation "androidx.lifecycle:lifecycle-viewmodel:2.6.2"
+    implementation "androidx.lifecycle:lifecycle-livedata:2.6.2"
+    implementation "androidx.lifecycle:lifecycle-common-java8:2.6.2"
 }
