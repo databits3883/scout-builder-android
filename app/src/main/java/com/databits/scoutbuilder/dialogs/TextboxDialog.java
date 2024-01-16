@@ -31,9 +31,6 @@ public class TextboxDialog extends DialogFragment {
 
   Preference preference = PowerPreference.getDefaultFile();
 
-  AtomicReference<TextInputLayout> popup_hint_example = new AtomicReference<>();
-
-
   public interface TextboxDialogListener {
     void onTextboxDialogPositiveClick(Cell newCell, boolean location, int viewId, int realId);
   }
@@ -84,16 +81,6 @@ public class TextboxDialog extends DialogFragment {
     TextView picker_help = v.findViewById(R.id.popup_help_text);
 
     ImageButton helpIcon = v.findViewById(R.id.help_button);
-    TextView picker_hint;
-
-    // Sets the saved title and hint text
-    popup_hint_example.set(v.findViewById(R.id.textbox_text_layout));
-    picker_hint = v.findViewById(R.id.popup_title_hint_text);
-    if (location) {
-      popup_hint_example.get().setHint(preference.getString("top_" + viewId + "_hint_value"));
-    } else {
-      popup_hint_example.get().setHint(preference.getString("bot_" + viewId + "_hint_value"));
-    }
 
     // Set default title to both TextViews
     picker_title.setText(title);
@@ -153,15 +140,9 @@ public class TextboxDialog extends DialogFragment {
           String cellTitle = picker_title.getText().toString();
 
           String newTitle = picker_title.getText().toString();
-          String hint = picker_hint.getText().toString();
           String newHelp = picker_help.getText().toString();
           if (!newTitle.isEmpty()) {
             preference.putString(viewId + "_title_value", title);
-          }
-          if (!hint.isEmpty()) {
-            preference.putString(viewId + "_hint_value", hint);
-
-            cellParam.setTextHint(hint);
           }
           if (!newHelp.isEmpty()) {
             preference.putString(viewId + "_help_value", newHelp);

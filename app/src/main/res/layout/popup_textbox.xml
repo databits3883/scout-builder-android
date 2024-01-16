@@ -74,48 +74,6 @@
             />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!--This layout sets the size/dimensions of the box-->
-    <TextView
-        android:id="@+id/hint"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="@string/HintTextTitle"
-        android:textAlignment="center"
-        android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/popup_help_layout"
-        />
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/popup_edittext_layout_hint"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/hint"
-        app:boxStrokeColor="@color/accent_color"
-        app:counterTextColor="@color/accent_color"
-        app:hintTextColor="@color/accent_color"
-        >
-
-        <!--This is the actual edit text which takes the input-->
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/popup_title_hint_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:imeOptions="actionDone"
-            android:selectAllOnFocus="true"
-            android:singleLine="true"
-            android:textCursorDrawable="@null"
-            android:textSize="34sp"
-            app:layout_constraintBottom_toTopOf="@+id/yes_no_example"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/filledTextField"
-            />
-    </com.google.android.material.textfield.TextInputLayout>
-
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline2"
         android:layout_width="wrap_content"
