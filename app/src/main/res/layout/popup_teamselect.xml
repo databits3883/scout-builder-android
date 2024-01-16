@@ -54,7 +54,7 @@
       android:id="@+id/help_button"
       android:layout_width="17dp"
       android:layout_height="17dp"
-      android:background="@drawable/help_icon"
+      android:background="@drawable/help_icon_red"
       app:layout_constraintBottom_toTopOf="@+id/teamSpinner"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintHorizontal_bias="0.31"

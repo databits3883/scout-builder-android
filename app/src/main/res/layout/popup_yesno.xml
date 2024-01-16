@@ -66,7 +66,7 @@
         android:layout_width="17dp"
         android:layout_height="17dp"
         android:layout_marginBottom="24dp"
-        android:background="@drawable/help_icon"
+        android:background="@drawable/help_icon_red"
         app:layout_constraintBottom_toTopOf="@+id/picker_example"
         app:layout_constraintEnd_toEndOf="parent"
         />

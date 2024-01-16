@@ -14,7 +14,7 @@
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/popup_edittext_layout_hint"
+        app:layout_constraintTop_toBottomOf="@+id/popup_help_layout"
         />
 
     <include
@@ -182,7 +182,7 @@
         android:layout_width="17dp"
         android:layout_height="17dp"
         android:layout_marginBottom="16dp"
-        android:background="@drawable/help_icon"
+        android:background="@drawable/help_icon_red"
         app:layout_constraintBottom_toTopOf="@+id/picker_example"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.75"

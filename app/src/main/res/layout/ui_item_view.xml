@@ -13,7 +13,7 @@
         android:id="@+id/help_button"
         android:layout_width="17dp"
         android:layout_height="17dp"
-        android:background="@drawable/help_icon"
+        android:background="@drawable/help_icon_red"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:visibility="visible"

@@ -63,7 +63,7 @@
         android:layout_width="17dp"
         android:layout_height="17dp"
         android:layout_marginBottom="16dp"
-        android:background="@drawable/help_icon"
+        android:background="@drawable/help_icon_red"
         app:layout_constraintBottom_toTopOf="@+id/menu_layout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.69"
