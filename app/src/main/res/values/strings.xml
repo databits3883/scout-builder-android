@@ -32,6 +32,7 @@
   <string name="credits">Cube and Cone images from Smashicons on flaticon.com</string>
   <string name="YesNoType">YesNo</string>
   <string name="CounterType">Counter</string>
+  <string name="CounterDisplayType">CounterDisplay</string>
   <string name="SegmentType">Segment</string>
   <string name="ListType">List</string>
   <string name="TextType">Text</string>
@@ -86,5 +87,6 @@
   <string name="TeamMatchType">TeamMatch</string>
   <string name="enter_the_help_text">Enter the Help Text</string>
   <string name="delete_cell">Delete Cell?</string>
+  <string name="select_team_title">Select Team</string>
 
 </resources>

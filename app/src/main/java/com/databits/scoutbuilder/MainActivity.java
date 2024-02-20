@@ -28,10 +28,13 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.databits.scoutbuilder.adapter.MultiviewTypeAdapter;
 import com.databits.scoutbuilder.adapter.RecyclerAdapter;
 import com.databits.scoutbuilder.adapter.RecyclerItemClickListener;
 import com.databits.scoutbuilder.adapter.SimpleItemTouchHelperCallback;
 import com.databits.scoutbuilder.dialogs.CounterDialog;
+import com.databits.scoutbuilder.dialogs.DualCounterDialog;
 import com.databits.scoutbuilder.dialogs.ListDialog;
 import com.databits.scoutbuilder.dialogs.PageSettingsDialog;
 import com.databits.scoutbuilder.dialogs.SegmentDialog;
@@ -57,7 +60,7 @@ import java.util.Objects;
 public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNoDialogListener,
     CounterDialog.CounterDialogListener, SegmentDialog.SegmentDialogListener,
     ListDialog.ListDialogListener, TextboxDialog.TextboxDialogListener,
-    PageSettingsDialog.PageSettingsDialogListener, TeamMatchDialog.TeamMatchDialogListener, TeamSelectDialog.TeamSelectDialogListener {
+    PageSettingsDialog.PageSettingsDialogListener, TeamMatchDialog.TeamMatchDialogListener, TeamSelectDialog.TeamSelectDialogListener, DualCounterDialog.DualCounterDialogListener {
 
     private static final String TAG = "MainActivity";
     private static final int NONE = 0;
@@ -72,10 +75,10 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
     ItemTouchHelper.Callback callbackBot;
     ItemTouchHelper mItemTouchHelperBot;
     TableLayout[] tables;
-    String[] cellTypes = {"YesNo", "Counter", "Segment", "List", "Text", "TeamSelect", "TeamMatch"};
-    String[] cellTitles = {"YesNo_title", "Counter_Title", "Segment_Title", "List_Title", "Textbox_title", "TeamSelect_Title", "TeamMatch_Title"};
-    private RecyclerAdapter mAdapterTop;
-    private RecyclerAdapter mAdapterBot;
+    String[] cellTypes = {"YesNo", "Counter","DualCounter", "Segment", "List", "Text", "TeamSelect", "TeamMatch"};
+    String[] cellTitles = {"YesNo_title", "Counter_Title", "Segment_Title", "List_Title", "Textbox_title", "TeamSelect_Title", "TeamMatch_Title", "CounterDisplay_Title"};
+    private MultiviewTypeAdapter mAdapterTop;
+    private MultiviewTypeAdapter mAdapterBot;
     private RecyclerView mRecyclerViewTop;
     private RecyclerView mRecyclerViewBot;
     private ClipboardManager clipboard;
@@ -314,7 +317,7 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
         mRecyclerViewBot.addItemDecoration(itemDecoration);
     }
 
-    private void editor(RecyclerView recyclerView, RecyclerAdapter adapter, boolean enabled) {
+    private void editor(RecyclerView recyclerView, MultiviewTypeAdapter adapter, boolean enabled) {
         boolean isTop = recyclerView == mRecyclerViewTop;
 
         if (enabled) {
@@ -362,11 +365,12 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
 
     private void testItems(int cells) {
         Moshi moshi = new Moshi.Builder().build();
-        JsonAdapter<RecyclerAdapter> jsonAdapter = moshi.adapter(RecyclerAdapter.class);
+        JsonAdapter<MultiviewTypeAdapter> jsonAdapter = moshi.adapter(MultiviewTypeAdapter.class);
 
+        CellParam cellParam;
         for (int i = 0; i < cells; i++) {
             String cellType = cellTypes[i];
-            CellParam cellParam = new CellParam(cellType);
+            cellParam = new CellParam(cellType);
             switch (cellType) {
                 case "YesNo":
                     cellParam.setType(getString(R.string.YesNoType));
@@ -406,25 +410,28 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
                     cellParam.setType(getString(R.string.TeamMatchType));
                     cellParam.setHelpText("This is a TeamMatch text");
                     break;
+                case "CounterDisplay":
+                    cellParam.setType("CounterDisplay");
+                    cellParam.setHelpText("This is an example");
+                    break;
             }
             Cell cell = new Cell(i, cellTitles[i], cellType, cellParam);
             cellList.add(cell);
         }
 
-        RecyclerAdapter myAdapter = new RecyclerAdapter(cellList);
+        MultiviewTypeAdapter myAdapter = new MultiviewTypeAdapter(cellList);
 
         String test = jsonAdapter.toJson(myAdapter);
         try {
-            RecyclerAdapter config = jsonAdapter.fromJson(test);
-            RecyclerAdapter configBot = jsonAdapter.fromJson(test);
-            mAdapterTop = new RecyclerAdapter(Objects.requireNonNull(config).mCell);
-            mAdapterBot = new RecyclerAdapter(Objects.requireNonNull(configBot).mCell);
+            MultiviewTypeAdapter config = jsonAdapter.fromJson(test);
+            MultiviewTypeAdapter configBot = jsonAdapter.fromJson(test);
+            mAdapterTop = new MultiviewTypeAdapter(Objects.requireNonNull(config).mCell);
+            mAdapterBot = new MultiviewTypeAdapter(Objects.requireNonNull(configBot).mCell);
         } catch (IOException e) {
             e.printStackTrace();
             Log.e(TAG, "Error parsing JSON", e);
-            mAdapterTop = new RecyclerAdapter(Collections.emptyList());
-            mAdapterBot = new RecyclerAdapter(Collections.emptyList());
-
+            mAdapterTop = new MultiviewTypeAdapter(Collections.emptyList());
+            mAdapterBot = new MultiviewTypeAdapter(Collections.emptyList());
         }
         /* } */
         mAdapterTop.notifyDataSetChanged();
@@ -544,6 +551,9 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
                 showTeamMatchDialog(preference.getString(1 + "_title_value", "Title"),
                     preference.getString(realPos + "_help_value"), pos, realPos, isTop);
                 break;
+            case "DualCounter":
+                showDualCounterDialog(preference.getString(1 + "_title_value", "Title"),
+                        preference.getString(realPos + "_help_value"), pos, realPos, isTop);
             case "Table":
                 break;
         }
@@ -559,10 +569,10 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
     // import cells from json string
     public void import_cells(String optional_json, RecyclerView mRecyclerView) {
         Moshi moshi = new Moshi.Builder().build();
-        JsonAdapter<RecyclerAdapter> jsonAdapter = moshi.adapter(RecyclerAdapter.class);
+        JsonAdapter<MultiviewTypeAdapter> jsonAdapter = moshi.adapter(MultiviewTypeAdapter.class);
         RecyclerAdapter mRecyclerViewAdapter;
         try {
-            RecyclerAdapter config = jsonAdapter.fromJson(optional_json);
+            MultiviewTypeAdapter config = jsonAdapter.fromJson(optional_json);
             mRecyclerViewAdapter = new RecyclerAdapter(Objects.requireNonNull(config).mCell);
             mRecyclerView.setAdapter(mRecyclerViewAdapter);
             Log.d(TAG, "import: " + optional_json);
@@ -575,7 +585,7 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
 
     public void save_json() {
         Moshi moshi = new Moshi.Builder().build();
-        JsonAdapter<RecyclerAdapter> jsonAdapter = moshi.adapter(RecyclerAdapter.class);
+        JsonAdapter<MultiviewTypeAdapter> jsonAdapter = moshi.adapter(MultiviewTypeAdapter.class);
         String jsonTop = jsonAdapter.toJson(mAdapterTop);
         String jsonBot = jsonAdapter.toJson(mAdapterBot);
 
@@ -595,7 +605,7 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
 
     public String export_string() {
         Moshi moshi = new Moshi.Builder().build();
-        JsonAdapter<RecyclerAdapter> jsonAdapter = moshi.adapter(RecyclerAdapter.class);
+        JsonAdapter<MultiviewTypeAdapter> jsonAdapter = moshi.adapter(MultiviewTypeAdapter.class);
 
         int table = preference.getInt("table_status", BOTH);
         String jsonTop = jsonAdapter.toJson(mAdapterTop);
@@ -654,22 +664,12 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
         return export.toString();
     }
 
-    // Save the current recycler view items to clipboard
-    public String saveToClipboard() {
-        String cells = export_string();
-//        String jsonTable = exportTable();
-        ClipData clip = ClipData.newPlainText("json", cells/* + "^" + jsonTable*/);
-        clipboard.setPrimaryClip(clip);
-        //Toast.makeText(this, "Saved to clipboard", Toast.LENGTH_SHORT).show();
-        return cells;
-    }
-
-    public void createItem(RecyclerAdapter mAdapter, RecyclerView mRecyclerView, Cell newCell) {
+    public void createItem(MultiviewTypeAdapter mAdapter, RecyclerView mRecyclerView, Cell newCell) {
         List<Cell> cells = new ArrayList<>();
         cells.add(newCell);
         mAdapter.mCell.addAll(cells);
         mRecyclerView.setAdapter(mAdapter);
-        mAdapter.notifyItemInserted(mAdapter.mCell.size());
+        mAdapter.notifyItemInserted(mAdapter.getItemCount());
     }
 
     // Handle menu options
@@ -719,7 +719,7 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
         }
 
         if (id == R.id.action_export) {
-            String fullJson = saveToClipboard();
+            String fullJson = export_string();
 
             // Make a dialog with text that can be copied
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -743,7 +743,6 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
                 // Send the ClipData to the clipboard
                 clipboard.setPrimaryClip(clip_export_json);
                 save_json();
-                //saveToClipboard();
                 dialog.dismiss();
             });
             builder.setNegativeButton(getString(R.string.cancel), (dialog, which) -> dialog.dismiss());
@@ -939,6 +938,18 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
         dialog.show(getSupportFragmentManager().beginTransaction(), "CounterDialog");
     }
 
+    private void showDualCounterDialog(String title, String help, int viewId, int realViewId, boolean location) {
+        DialogFragment dialog = new DualCounterDialog();
+        Bundle args = new Bundle();
+        args.putString("title", title);
+        args.putInt("id", viewId);
+        args.putBoolean("location", location);
+        args.putInt("real_id", realViewId);
+        args.putString("help", help);
+        dialog.setArguments(args);
+        dialog.show(getSupportFragmentManager().beginTransaction(), "DualCounterDialog");
+    }
+
     public void showYesNoDialog(String title, String help, int viewId, int realViewId, boolean location) {
         DialogFragment dialog = new YesNoDialog();
         Bundle args = new Bundle();
@@ -954,7 +965,7 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
     @Override
     public void onYesNoDialogPositiveClick(Cell newCell, boolean location, int position,
         int realPosition) {
-        RecyclerAdapter mAdapter = location ? mAdapterTop : mAdapterBot;
+        MultiviewTypeAdapter mAdapter = location ? mAdapterTop : mAdapterBot;
         RecyclerView mRecyclerView = location ? mRecyclerViewTop : mRecyclerViewBot;
 
         String locationString = location ? "top" : "bot";
@@ -980,7 +991,34 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
     @Override
     public void onCounterDialogPositiveClick(Cell newCell, boolean location, int position,
         int realPosition) {
-        RecyclerAdapter mAdapter = location ? mAdapterTop : mAdapterBot;
+        MultiviewTypeAdapter mAdapter = location ? mAdapterTop : mAdapterBot;
+        RecyclerView mRecyclerView = location ? mRecyclerViewTop : mRecyclerViewBot;
+        if (!preference.getBoolean("edit_mode", false)) {
+            createItem(mAdapter, mRecyclerView, newCell);
+        } else {
+            // Cell is null if we want to delete the cell
+            if (newCell != null) {
+                Cell curCell = mAdapter.mCell.get(position);
+                curCell.setTitle(newCell.getTitle());
+                curCell.setParam(newCell.getParam());
+                mAdapter.notifyItemChanged(position);
+            } else {
+                preference.remove(position + "_default_picker_value");
+                preference.remove(position + "_min_picker_value");
+                preference.remove(position + "_max_picker_value");
+                preference.remove(position + "_unit_picker_value");
+                preference.remove(position + "_title_value");
+                preference.remove(position + "_help_value");
+                mAdapter.mCell.remove(position);
+                mAdapter.notifyItemRemoved(position);
+            }
+        }
+    }
+
+    @Override
+    public void onDualCounterDialogPositiveClick(Cell newCell, boolean location, int position,
+                                             int realPosition) {
+        MultiviewTypeAdapter mAdapter = location ? mAdapterTop : mAdapterBot;
         RecyclerView mRecyclerView = location ? mRecyclerViewTop : mRecyclerViewBot;
         if (!preference.getBoolean("edit_mode", false)) {
             createItem(mAdapter, mRecyclerView, newCell);
@@ -1006,7 +1044,7 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
 
     @Override public void onSegmentDialogPositiveClick(Cell newCell, boolean location, int position,
         int realPosition) {
-        RecyclerAdapter mAdapter = location ? mAdapterTop : mAdapterBot;
+        MultiviewTypeAdapter mAdapter = location ? mAdapterTop : mAdapterBot;
         RecyclerView mRecyclerView = location ? mRecyclerViewTop : mRecyclerViewBot;
         if (!preference.getBoolean("edit_mode", false)) {
             createItem(mAdapter, mRecyclerView, newCell);
@@ -1032,7 +1070,7 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
 
     @Override public void onListDialogPositiveClick(Cell newCell, boolean location, int position,
         int realId) {
-        RecyclerAdapter mAdapter = location ? mAdapterTop : mAdapterBot;
+        MultiviewTypeAdapter mAdapter = location ? mAdapterTop : mAdapterBot;
         RecyclerView mRecyclerView = location ? mRecyclerViewTop : mRecyclerViewBot;
         if (!preference.getBoolean("edit_mode", false)) {
             createItem(mAdapter, mRecyclerView, newCell);
@@ -1056,7 +1094,7 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
 
     @Override public void onTextboxDialogPositiveClick(Cell newCell, boolean location, int position,
         int realId) {
-        RecyclerAdapter mAdapter = location ? mAdapterTop : mAdapterBot;
+        MultiviewTypeAdapter mAdapter = location ? mAdapterTop : mAdapterBot;
         RecyclerView mRecyclerView = location ? mRecyclerViewTop : mRecyclerViewBot;
         if (!preference.getBoolean("edit_mode", false)) {
             createItem(mAdapter, mRecyclerView, newCell);
@@ -1079,7 +1117,7 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
 
     @Override public void onTeamSelectDialogPositiveClick(Cell newCell, boolean location, int position,
         int realPosition) {
-        RecyclerAdapter mAdapter = location ? mAdapterTop : mAdapterBot;
+        MultiviewTypeAdapter mAdapter = location ? mAdapterTop : mAdapterBot;
         RecyclerView mRecyclerView = location ? mRecyclerViewTop : mRecyclerViewBot;
         if (!preference.getBoolean("edit_mode", false)) {
             createItem(mAdapter, mRecyclerView, newCell);
@@ -1109,7 +1147,7 @@ public class MainActivity extends AppCompatActivity implements YesNoDialog.YesNo
 
     @Override public void onTeamMatchDialogPositiveClick(Cell newCell, boolean location, int position,
         int realPosition) {
-        RecyclerAdapter mAdapter = location ? mAdapterTop : mAdapterBot;
+        MultiviewTypeAdapter mAdapter = location ? mAdapterTop : mAdapterBot;
         RecyclerView mRecyclerView = location ? mRecyclerViewTop : mRecyclerViewBot;
         if (!preference.getBoolean("edit_mode", false)) {
             createItem(mAdapter, mRecyclerView, newCell);
